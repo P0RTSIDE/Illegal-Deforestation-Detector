@@ -27,19 +27,30 @@ This updates `summary.json` from `data/raw/gee_metadata.json` and replaces `flag
 
 ## Deploy to Vercel
 
+### Fix: "No python entrypoint found"
+
+That error means Vercel is trying to deploy the **Python repo root** (`requirements.txt`) instead of this Next.js app.
+
+**Do this:**
+
+1. Vercel dashboard → your project → **Settings** → **General**
+2. **Root Directory** → set to `web` → **Save**
+3. **Deployments** → latest failed deploy → **Redeploy**
+
+Framework should show **Next.js**. No Python env vars needed.
+
 ### Option A — Vercel dashboard (recommended)
 
 1. Push repo to GitHub.
 2. [vercel.com/new](https://vercel.com/new) → Import repository.
-3. Set **Root Directory** to `web`.
-4. Deploy (defaults: Next.js, no env vars needed for demo).
+3. Set **Root Directory** to `web` before deploying.
+4. Deploy.
 
 ### Option B — CLI
 
 ```bash
-npm i -g vercel
 cd web
-vercel
+npx vercel
 ```
 
 Follow prompts. Production: `vercel --prod`.

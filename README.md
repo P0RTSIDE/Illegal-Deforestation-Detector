@@ -115,7 +115,19 @@ npm run dev
 python scripts/export_for_web.py
 ```
 
-**Deploy:** Push to GitHub → [vercel.com/new](https://vercel.com/new) → set **Root Directory** to `web`. See `web/README.md`.
+**Deploy:** Push to GitHub → [vercel.com/new](https://vercel.com/new) → import repo.
+
+**Important — fix "No python entrypoint found" error:**
+
+Vercel must deploy the **`web/`** folder (Next.js), not the repo root (Python).
+
+1. Vercel project → **Settings** → **General**
+2. **Root Directory** → Edit → enter `web` → Save
+3. **Redeploy** (Deployments → ⋯ → Redeploy)
+
+Alternatively, the repo includes a root `vercel.json` that builds `web/` via npm — but setting Root Directory to `web` is the most reliable fix.
+
+See `web/README.md` for local dev.
 
 The map currently shows **demo polygons** until you run change detection + `export_for_web.py` with real `flagged_sites.geojson`.
 
