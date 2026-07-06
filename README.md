@@ -29,7 +29,7 @@ Portfolio project combining **Sentinel-2 change detection** with **public conces
 cd deforestation-detector
 python -m venv .venv
 .venv\Scripts\activate        # Windows
-pip install -r requirements.txt
+pip install -r python/requirements.txt
 ```
 
 ### 3. Authenticate Earth Engine
@@ -95,7 +95,7 @@ deforestation-detector/
     public/data/            # GeoJSON + summary JSON for the map
   reports/
     figures/
-  requirements.txt
+  python/requirements.txt
   README.md
 ```
 

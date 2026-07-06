@@ -11,7 +11,13 @@ venv/
 
 # Earth Engine credentials (stored outside repo by default)
 .credentials/
+# JSON — ignore data exports, keep app config
 *.json
+!package.json
+!package-lock.json
+!web/package.json
+!web/package-lock.json
+!web/tsconfig.json
 !web/public/data/*.json
 !data/raw/gee_metadata.json
 !data/**/*.json.example

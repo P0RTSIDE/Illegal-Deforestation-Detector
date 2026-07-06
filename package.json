@@ -1,0 +1,10 @@
+{
+  "name": "deforestation-detector",
+  "private": true,
+  "description": "Monorepo root — Vercel deploys the Next.js app in web/",
+  "scripts": {
+    "build": "npm run build --prefix web",
+    "dev": "npm run dev --prefix web",
+    "vercel-build": "npm install --prefix web && npm run build --prefix web"
+  }
+}

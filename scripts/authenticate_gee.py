@@ -19,7 +19,7 @@ def main() -> None:
     print("\nAuthentication complete. Credentials saved locally.")
     print("Next steps:")
     print("  1. Copy .env.example to .env and set GEE_PROJECT_ID=your-project-id")
-    print("  2. pip install -r requirements.txt")
+    print("  2. pip install -r python/requirements.txt")
     print("  3. python scripts/test_gee_pull.py")
 
 
