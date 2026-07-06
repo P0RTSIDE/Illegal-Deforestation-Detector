@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+.venv/
+venv/
+.env
+
+# Earth Engine credentials (stored outside repo by default)
+.credentials/
+*.json
+!web/public/data/*.json
+!data/raw/gee_metadata.json
+!data/**/*.json.example
+
+# Data (large exports — keep structure, ignore binaries)
+data/raw/**/*.tif
+data/raw/**/*.tiff
+data/raw/**/*.zip
+data/raw/**/*.shp
+data/raw/**/*.shx
+data/raw/**/*.dbf
+data/raw/**/*.prj
+data/raw/**/*.cpg
+data/processed/**
+!web/public/data/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Node (web dashboard)
+web/node_modules/
+web/.next/
+web/out/
+
+# Reports build artifacts
+reports/map_app/__pycache__/

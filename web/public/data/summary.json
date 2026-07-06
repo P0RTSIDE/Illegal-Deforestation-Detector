@@ -1,0 +1,24 @@
+{
+  "study_area": "Southern Par\u00e1 (Novo Progresso corridor)",
+  "bbox": [
+    -56.3,
+    -7.9,
+    -55.25,
+    -7.05
+  ],
+  "before_year": 2019,
+  "after_year": 2023,
+  "before_image_count": 359,
+  "after_image_count": 332,
+  "total_flagged_sites": 250,
+  "total_flagged_area_ha": 14907.8,
+  "by_status": {
+    "likely_unpermitted": 6,
+    "likely_exceeding_permit": 0,
+    "likely_permitted": 16,
+    "unknown": 228
+  },
+  "data_mode": "live",
+  "method": "NDVI loss > 0.18, min 5.0 ha, 30m",
+  "last_updated": "2026-07-06"
+}

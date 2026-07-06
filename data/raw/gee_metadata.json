@@ -1,0 +1,22 @@
+{
+  "study_area": "Southern Par\u00e1 (Novo Progresso corridor)",
+  "bbox": [
+    -56.3,
+    -7.9,
+    -55.25,
+    -7.05
+  ],
+  "before_year": 2019,
+  "after_year": 2023,
+  "before_image_count": 359,
+  "after_image_count": 332,
+  "bands": [
+    "B2",
+    "B3",
+    "B4",
+    "B8",
+    "B11",
+    "B12"
+  ],
+  "cloud_prob_threshold": 40
+}

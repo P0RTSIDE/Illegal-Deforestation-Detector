@@ -1,0 +1,24 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Study area AOI",
+        "study_area": "Southern Pará (Novo Progresso corridor)"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-56.3, -7.9],
+            [-55.25, -7.9],
+            [-55.25, -7.05],
+            [-56.3, -7.05],
+            [-56.3, -7.9]
+          ]
+        ]
+      }
+    }
+  ]
+}
