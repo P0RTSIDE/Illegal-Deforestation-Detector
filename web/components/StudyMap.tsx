@@ -10,11 +10,8 @@ import {
 } from "react-leaflet";
 import type { FeatureCollection } from "geojson";
 import L from "leaflet";
-import {
-  STATUS_COLORS,
-  STATUS_LABELS,
-  type FlaggedSiteProperties,
-} from "@/lib/types";
+import { STATUS_COLORS, type FlaggedSiteProperties } from "@/lib/types";
+import { buildSitePopup } from "@/lib/copy";
 
 import "leaflet/dist/leaflet.css";
 
@@ -79,13 +76,13 @@ export default function StudyMap({
     >
       <FitStudyBounds bbox={bbox} />
       <LayersControl position="topright">
-        <LayersControl.BaseLayer checked name="Esri Satellite">
+        <LayersControl.BaseLayer checked name="Satellite imagery">
           <TileLayer
             attribution="Tiles &copy; Esri"
             url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
           />
         </LayersControl.BaseLayer>
-        <LayersControl.BaseLayer name="OpenStreetMap">
+        <LayersControl.BaseLayer name="Street map">
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -113,14 +110,7 @@ export default function StudyMap({
         }
         onEachFeature={(feature, layer) => {
           const props = feature.properties as FlaggedSiteProperties;
-          layer.bindPopup(`
-            <strong>${props.name}</strong><br/>
-            Status: ${STATUS_LABELS[props.permit_status]}<br/>
-            Area: ${props.area_ha.toFixed(1)} ha<br/>
-            Detected: ${props.detected_year}<br/>
-            Method: ${props.method}<br/>
-            <em>${props.notes}</em>
-          `);
+          layer.bindPopup(buildSitePopup(props), { maxWidth: 320 });
         }}
       />
     </MapContainer>

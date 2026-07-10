@@ -1,9 +1,15 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import type { FeatureCollection } from "geojson";
 import type { SummaryData } from "@/lib/types";
-import { STATUS_COLORS, STATUS_LABELS, type PermitStatus } from "@/lib/types";
+import { STATUS_COLORS, type PermitStatus } from "@/lib/types";
+import {
+  STATUS_LABELS_PLAIN,
+  STATUS_DESCRIPTIONS,
+  DATA_SOURCES,
+} from "@/lib/copy";
 
 const StudyMap = dynamic(() => import("@/components/StudyMap"), {
   ssr: false,
@@ -41,30 +47,70 @@ export default function Dashboard({
   return (
     <>
       <section className="hero">
-        <h1>Satellite-Based Illegal Deforestation / Mining Detector</h1>
+        <h1>Forest Clearing &amp; Permit Map</h1>
         <p>
-          Change detection on Sentinel-2 imagery cross-referenced against public
-          concession boundaries in the Brazilian Amazon. This dashboard shows
-          flagged clearings by permit status — a heuristic signal, not a legal
-          finding.
+          This map shows places where satellite images detected vegetation loss
+          in the Brazilian Amazon, then checks those spots against public mining
+          permit records. Colored shapes are flagged areas, not court rulings.
+          Click any shape for details and data sources.
         </p>
         <div className="badge-row">
           <span className="badge">{summary.study_area}</span>
           <span className="badge">
-            {summary.before_year} → {summary.after_year}
+            Comparing {summary.before_year} to {summary.after_year}
           </span>
           <span className="badge">
-            {summary.data_mode === "demo" ? "Demo data" : "Live — NDVI change detection"}
+            {summary.data_mode === "demo"
+              ? "Sample data"
+              : "Live satellite analysis"}
           </span>
-          {summary.data_mode === "live" && summary.method && (
-            <span className="badge">{summary.method}</span>
-          )}
+        </div>
+      </section>
+
+      <section className="card how-to-read">
+        <h2>How to read the map</h2>
+        <div className="how-to-grid">
+          <div>
+            <h3>Colored shapes</h3>
+            <p>
+              Each colored polygon is a patch where satellite data shows likely
+              vegetation loss between {summary.before_year} and{" "}
+              {summary.after_year}. Bigger shapes mean larger cleared areas.
+            </p>
+          </div>
+          <div>
+            <h3>Blue dashed box</h3>
+            <p>
+              The blue outline is the study region we analyzed. Only clearings
+              inside this box are shown.
+            </p>
+          </div>
+          <div>
+            <h3>Click a shape</h3>
+            <p>
+              Click any flagged area to open a popup with plain-language status,
+              cleared area size, detection method, and links to the public data
+              behind the flag.
+            </p>
+          </div>
+          <div>
+            <h3>What this is not</h3>
+            <p>
+              This tool does not prove illegal activity. It highlights clearings
+              that are not explained by available public permit records, or that
+              may not match those records.
+            </p>
+          </div>
         </div>
       </section>
 
       <section className="map-section">
         <div className="card">
           <h2>Interactive map</h2>
+          <p className="card-intro">
+            Use the layer control (top right) to switch between satellite and
+            street map views. Zoom in to inspect individual sites.
+          </p>
           <StudyMap
             studyArea={studyArea}
             flaggedSites={flaggedSites}
@@ -76,112 +122,118 @@ export default function Dashboard({
 
       <div className="summary-row">
         <div className="card">
-          <h2>Summary</h2>
+          <h2>At a glance</h2>
           <div className="stats-grid">
             <div className="stat">
-              <div className="label">Flagged sites</div>
+              <div className="label">Flagged areas</div>
               <div className="value">{summary.total_flagged_sites}</div>
             </div>
             <div className="stat">
-              <div className="label">Flagged area</div>
+              <div className="label">Total cleared area</div>
               <div className="value">
                 {summary.total_flagged_area_ha.toFixed(0)} ha
               </div>
             </div>
             <div className="stat">
-              <div className="label">S2 scenes (before)</div>
+              <div className="label">Satellite scenes ({summary.before_year})</div>
               <div className="value">{summary.before_image_count}</div>
             </div>
             <div className="stat">
-              <div className="label">S2 scenes (after)</div>
+              <div className="label">Satellite scenes ({summary.after_year})</div>
               <div className="value">{summary.after_image_count}</div>
             </div>
           </div>
         </div>
 
         <div className="card">
-          <h2>Legend</h2>
-          <div className="legend">
-            {(Object.keys(STATUS_LABELS) as PermitStatus[]).map((status) => (
-              <div className="legend-item" key={status}>
+          <h2>What the colors mean</h2>
+          <div className="legend legend-detailed">
+            {(Object.keys(STATUS_LABELS_PLAIN) as PermitStatus[]).map(
+              (status) => (
+                <div className="legend-block" key={status}>
+                  <div className="legend-item">
+                    <span
+                      className="swatch"
+                      style={{ background: STATUS_COLORS[status] }}
+                    />
+                    <strong>{STATUS_LABELS_PLAIN[status]}</strong>
+                    <span className="legend-count">
+                      ({summary.by_status[status]})
+                    </span>
+                  </div>
+                  <p className="legend-desc">{STATUS_DESCRIPTIONS[status]}</p>
+                </div>
+              )
+            )}
+            <div className="legend-block">
+              <div className="legend-item">
                 <span
                   className="swatch"
-                  style={{ background: STATUS_COLORS[status] }}
+                  style={{
+                    background: "transparent",
+                    border: "2px dashed #38bdf8",
+                  }}
                 />
-                {STATUS_LABELS[status]} ({summary.by_status[status]})
+                <strong>Study area boundary</strong>
               </div>
-            ))}
-            <div className="legend-item">
-              <span
-                className="swatch"
-                style={{
-                  background: "transparent",
-                  border: "2px dashed #38bdf8",
-                }}
-              />
-              Study area boundary
+              <p className="legend-desc">
+                The region covered by this analysis. The map zooms to this box
+                on load.
+              </p>
             </div>
           </div>
         </div>
       </div>
 
-      <section className="section">
-        <h2>Pipeline progress</h2>
-        <div className="steps">
-          <div className="step done">
-            <div className="step-num">1</div>
-            <div>
-              <strong>GEE data pull</strong>
-              <p>
-                Sentinel-2 composites verified ({summary.before_image_count} /{" "}
-                {summary.after_image_count} scenes).
-              </p>
-            </div>
-          </div>
-          <div className="step active">
-            <div className="step-num">2</div>
-            <div>
-              <strong>Preprocessing + baseline change detection</strong>
-              <p>Cloud masking, tiling, NDVI/NBR spectral index differencing.</p>
-            </div>
-          </div>
-          <div className="step">
-            <div className="step-num">3</div>
-            <div>
-              <strong>Learned model (Siamese / U-Net)</strong>
-              <p>Train on Hansen labels with spatial hold-out validation.</p>
-            </div>
-          </div>
-          <div className="step">
-            <div className="step-num">4</div>
-            <div>
-              <strong>Concession cross-reference</strong>
-              <p>Spatial join vs ANM SIGMINE + GFW layers.</p>
-            </div>
-          </div>
-          <div className="step">
-            <div className="step-num">5</div>
-            <div>
-              <strong>Replace demo map data with live outputs</strong>
-              <p>
-                Run <code>python scripts/export_for_web.py</code> after inference.
-              </p>
-            </div>
-          </div>
-        </div>
+      <section className="card sources-card">
+        <h2>Public data behind this map</h2>
+        <ul className="sources-list">
+          <li>
+            <a
+              href={DATA_SOURCES.sentinel2.url}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {DATA_SOURCES.sentinel2.name}
+            </a>
+            : {DATA_SOURCES.sentinel2.role}
+          </li>
+          <li>
+            <a
+              href={DATA_SOURCES.anm_sigmine.url}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {DATA_SOURCES.anm_sigmine.name}
+            </a>
+            : {DATA_SOURCES.anm_sigmine.role}
+          </li>
+          <li>
+            <a
+              href={DATA_SOURCES.inpe_deter.url}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {DATA_SOURCES.inpe_deter.name}
+            </a>
+            : {DATA_SOURCES.inpe_deter.role}
+          </li>
+        </ul>
+        <p>
+          Want the full technical walkthrough? See the{" "}
+          <Link href="/methodology">Methodology</Link> page.
+        </p>
       </section>
 
       <div className="disclaimer">
-        <strong>Limitations:</strong> Flagged sites mean &quot;not accounted for
-        in available public concession records,&quot; not proven illegality.
-        Concession registries are incomplete; garimpo sites often lack formal
-        polygons. 10 m Sentinel-2 misses sub-hectare clearings. No field
-        verification in v1.
+        <strong>Important:</strong> Flagged areas are automated hints based on
+        satellite imagery and incomplete public permit databases. They are not
+        legal findings and have not been verified on the ground. Small clearings
+        and informal mining sites are easy to miss.
       </div>
 
       <footer>
-        Last updated: {summary.last_updated}. Built with Next.js + Leaflet.
-        Python ML pipeline in repo root.
+        Last updated: {summary.last_updated}. Built with Next.js and Leaflet.
       </footer>
     </>
   );

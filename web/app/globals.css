@@ -254,6 +254,142 @@ footer {
   font-family: inherit;
 }
 
+.card-intro {
+  color: var(--muted);
+  font-size: 0.92rem;
+  margin: 0 0 0.75rem;
+}
+
+.how-to-read {
+  margin-bottom: 1.25rem;
+}
+
+.how-to-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .how-to-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.how-to-grid h3 {
+  margin: 0 0 0.35rem;
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+.how-to-grid p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.legend-detailed .legend-block {
+  margin-bottom: 0.85rem;
+}
+
+.legend-detailed .legend-block:last-child {
+  margin-bottom: 0;
+}
+
+.legend-count {
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin-left: 0.25rem;
+}
+
+.legend-desc {
+  margin: 0.25rem 0 0 1.7rem;
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.sources-card {
+  margin-top: 1.25rem;
+}
+
+.sources-list {
+  margin: 0 0 0.75rem;
+  padding-left: 1.25rem;
+  color: var(--muted);
+}
+
+.sources-list li {
+  margin-bottom: 0.4rem;
+}
+
+.sources-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+/* Leaflet popup styling */
+.leaflet-popup-content-wrapper {
+  border-radius: 10px;
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+.leaflet-popup-content {
+  margin: 0.75rem 0.9rem;
+  line-height: 1.45;
+  font-size: 0.88rem;
+}
+
+.site-popup-title {
+  display: block;
+  font-size: 1rem;
+  margin-bottom: 0.35rem;
+}
+
+.site-popup-status {
+  margin: 0 0 0.5rem;
+}
+
+.site-popup-tag {
+  display: inline-block;
+  padding: 0.15rem 0.45rem;
+  border-radius: 6px;
+  background: #e2e8f0;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.site-popup-text,
+.site-popup-notes,
+.site-popup-fine-print {
+  margin: 0 0 0.5rem;
+  color: #334155;
+}
+
+.site-popup-facts,
+.site-popup-sources {
+  margin: 0.35rem 0 0.5rem;
+  padding-left: 1.1rem;
+}
+
+.site-popup-sources-title {
+  margin: 0.5rem 0 0.25rem;
+  font-size: 0.85rem;
+}
+
+.site-popup-fine-print {
+  font-size: 0.78rem;
+  color: #64748b;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 0.45rem;
+  margin-top: 0.5rem;
+}
+
+.site-popup a {
+  color: #0369a1;
+}
+
 /* Site navigation */
 .site-nav {
   position: sticky;

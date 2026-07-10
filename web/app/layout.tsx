@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Deforestation Detector | Satellite + Permit Cross-Reference",
+  title: "Forest Clearing & Permit Map | Brazilian Amazon",
   description:
-    "Portfolio project detecting land-cover change in the Brazilian Amazon and cross-referencing against public mining/logging concession data.",
+    "Satellite-detected vegetation loss cross-referenced against public mining permit records in the Brazilian Amazon.",
 };
 
 export default function RootLayout({

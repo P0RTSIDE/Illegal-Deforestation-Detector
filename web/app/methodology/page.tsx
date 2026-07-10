@@ -5,7 +5,16 @@ import SiteNav from "@/components/SiteNav";
 export const metadata: Metadata = {
   title: "Methodology | Deforestation Detector",
   description:
-    "How Sentinel-2 change detection is combined with public concession data to flag likely unpermitted clearing in the Brazilian Amazon.",
+    "Technical documentation for Sentinel-2 change detection and public concession cross-referencing in the Brazilian Amazon.",
+};
+
+const SOURCE_LINKS = {
+  s2: "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED",
+  s2cloud: "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_CLOUD_PROBABILITY",
+  anm: "https://dadosabertos.anm.gov.br/SIGMINE/PROCESSOS_MINERARIOS/",
+  deter: "https://terrabrasilis.dpi.inpe.br/downloads/",
+  hansen: "https://storage.googleapis.com/earthengine-stac/catalog/UMD_hansen_global_forest_change_2023_v1.json",
+  gfw: "https://data.globalforestwatch.org/",
 };
 
 export default function MethodologyPage() {
@@ -16,18 +25,17 @@ export default function MethodologyPage() {
         <section className="hero">
           <h1>Methodology</h1>
           <p>
-            This project detects land-cover change from satellite imagery and
-            cross-references detected clearings against public mining and logging
-            concession boundaries. The goal is a credible applied-ML portfolio
-            piece — not just &quot;change was detected,&quot; but whether that
-            change appears accounted for in available permit records.
+            This page documents the full technical pipeline. The{" "}
+            <Link href="/">dashboard</Link> uses plain language; this page is
+            for reviewers, researchers, and hiring managers who want implementation
+            detail.
           </p>
         </section>
 
         <section className="card methodology-block">
           <h2>Study area</h2>
           <p>
-            <strong>Southern Pará (Novo Progresso corridor)</strong> — a ~55 × 45
+            <strong>Southern Pará (Novo Progresso corridor)</strong>: a ~115 × 95
             km pilot AOI along the BR-163 highway. The region has high INPE DETER
             alert density and documented pressure from illegal mining and forest
             clearing.
@@ -43,16 +51,18 @@ export default function MethodologyPage() {
           <h2>1. Data acquisition</h2>
           <p>
             Imagery is pulled via the Google Earth Engine Python API from{" "}
-            <code>COPERNICUS/S2_SR_HARMONIZED</code> (Sentinel-2 L2A surface
-            reflectance). Bands B2, B3, B4, B8 (10 m) and B11, B12 (20 m SWIR)
-            support vegetation and bare-soil/mining discrimination.
+            <a href={SOURCE_LINKS.s2} target="_blank" rel="noopener noreferrer">
+              <code>COPERNICUS/S2_SR_HARMONIZED</code>
+            </a>{" "}
+            (Sentinel-2 L2A surface reflectance). Bands B2, B3, B4, B8 (10 m) and
+            B11, B12 (20 m SWIR) support vegetation and bare-soil/mining
+            discrimination.
           </p>
           <p>
-            Cloud and shadow masking uses the s2cloudless collection (
-            <code>COPERNICUS/S2_CLOUD_PROBABILITY</code>, threshold 40%).
-            Annual <strong>median composites</strong> reduce residual cloud noise
-            in this tropical AOI — a practical trade-off vs. picking two single
-            low-cloud dates.
+            Cloud masking uses the Sentinel-2 Scene Classification Layer (SCL) on
+            each scene before compositing. Annual <strong>median composites</strong>{" "}
+            reduce residual cloud noise in this tropical AOI. This is a practical
+            trade-off compared with picking two single low-cloud dates.
           </p>
         </section>
 
@@ -72,27 +82,31 @@ export default function MethodologyPage() {
         <section className="card methodology-block">
           <h2>3. Change detection (two approaches)</h2>
           <p>
-            Two methods are implemented and compared — baseline first, learned
-            model second.
+            Two methods are implemented and compared: a spectral index baseline
+            first, then a learned model.
           </p>
 
-          <h3>Baseline: spectral index differencing</h3>
+          <h3>Baseline: spectral index differencing (currently live on the map)</h3>
           <p>
-            Compute NDVI and NBR (Normalized Burn Ratio) for before and after
-            composites. Flag pixels where the index drop exceeds a threshold.
-            Fast, interpretable, and commonly used operationally. Works well for
-            forest clearing; weaker on bare-soil mining sites where vegetation
+            Compute NDVI for before and after composites. Flag pixels where
+            vegetation index loss exceeds 0.18 and where pre-change NDVI was above
+            0.55 (the pixel was vegetated). Vectorize at 30 m and keep patches ≥
+            5 ha. Fast, interpretable, and commonly used operationally. Works well
+            for forest clearing; weaker on bare-soil mining sites where vegetation
             indices underperform.
           </p>
 
-          <h3>Learned model: Siamese / early-fusion U-Net</h3>
+          <h3>Learned model: Siamese / early-fusion U-Net (planned)</h3>
           <p>
             A convolutional model takes before/after patch pairs and outputs a
-            binary change mask. Training labels come from Hansen Global Forest
-            Change tree-cover loss (imperfect but usable at portfolio scale).
-            Validation uses a <strong>spatial hold-out region</strong>, not
-            random pixel splits — spatial autocorrelation makes random splits
-            misleadingly optimistic for geospatial data.
+            binary change mask. Training labels come from{" "}
+            <a href={SOURCE_LINKS.hansen} target="_blank" rel="noopener noreferrer">
+              Hansen Global Forest Change
+            </a>{" "}
+            tree-cover loss (imperfect but usable at portfolio scale). Validation
+            uses a <strong>spatial hold-out region</strong>, not random pixel
+            splits. Spatial autocorrelation makes random splits misleadingly
+            optimistic for geospatial data.
           </p>
           <p>
             Metrics reported for both approaches: IoU and F1, with discussion of
@@ -104,8 +118,11 @@ export default function MethodologyPage() {
           <h2>4. Concession cross-referencing</h2>
           <p>
             This is the differentiating step. Change masks are converted to vector
-            polygons (raster-to-vector), then spatially joined against public
-            concession layers using geopandas.
+            polygons (raster-to-vector), then spatially joined against{" "}
+            <a href={SOURCE_LINKS.anm} target="_blank" rel="noopener noreferrer">
+              ANM SIGMINE
+            </a>{" "}
+            mining permit polygons for Pará using geopandas.
           </p>
 
           <div className="status-table-wrap">
@@ -153,8 +170,11 @@ export default function MethodologyPage() {
           <h2>5. Validation</h2>
           <ul className="method-list">
             <li>
-              Compare flagged sites against INPE DETER near-real-time alerts and
-              PRODES annual deforestation polygons
+              Compare flagged sites against{" "}
+              <a href={SOURCE_LINKS.deter} target="_blank" rel="noopener noreferrer">
+                INPE DETER
+              </a>{" "}
+              near-real-time alerts and PRODES annual deforestation polygons
             </li>
             <li>
               Sanity-check total detected change area against Hansen aggregate
@@ -181,12 +201,25 @@ export default function MethodologyPage() {
               <tbody>
                 <tr>
                   <td>Sentinel-2 L2A</td>
-                  <td>Google Earth Engine</td>
+                  <td>
+                    <a href={SOURCE_LINKS.s2} target="_blank" rel="noopener noreferrer">
+                      Google Earth Engine
+                    </a>
+                  </td>
                   <td>Before/after imagery</td>
                 </tr>
                 <tr>
                   <td>Mining concessions</td>
-                  <td>ANM SIGMINE (primary), GFW (cross-check)</td>
+                  <td>
+                    <a href={SOURCE_LINKS.anm} target="_blank" rel="noopener noreferrer">
+                      ANM SIGMINE
+                    </a>{" "}
+                    (primary),{" "}
+                    <a href={SOURCE_LINKS.gfw} target="_blank" rel="noopener noreferrer">
+                      GFW
+                    </a>{" "}
+                    (cross-check)
+                  </td>
                   <td>Permit boundaries</td>
                 </tr>
                 <tr>
@@ -196,12 +229,20 @@ export default function MethodologyPage() {
                 </tr>
                 <tr>
                   <td>Tree cover loss</td>
-                  <td>Hansen GFC (UMD)</td>
+                  <td>
+                    <a href={SOURCE_LINKS.hansen} target="_blank" rel="noopener noreferrer">
+                      Hansen GFC (UMD)
+                    </a>
+                  </td>
                   <td>Training / validation labels</td>
                 </tr>
                 <tr>
                   <td>Deforestation alerts</td>
-                  <td>INPE DETER / PRODES</td>
+                  <td>
+                    <a href={SOURCE_LINKS.deter} target="_blank" rel="noopener noreferrer">
+                      INPE DETER / PRODES
+                    </a>
+                  </td>
                   <td>Operational validation</td>
                 </tr>
               </tbody>
@@ -224,14 +265,14 @@ export default function MethodologyPage() {
           <strong>Important caveat:</strong> This is a heuristic flagging system
           based on public data completeness, not a legal determination. Concession
           registries are often outdated or incomplete. &quot;Outside a
-          concession&quot; means not accounted for in available public records —
+          concession&quot; means not accounted for in available public records,
           not proven illegality. 10 m Sentinel-2 resolution misses small-scale
           clearings; cloud cover creates temporal gaps; garimpo sites frequently
           lack formal polygons. No field verification in v1.
         </div>
 
         <footer>
-          <Link href="/">← Back to dashboard</Link>
+          <Link href="/">Back to dashboard</Link>
         </footer>
       </main>
     </>

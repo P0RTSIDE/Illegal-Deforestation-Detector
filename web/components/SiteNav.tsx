@@ -9,7 +9,7 @@ export default function SiteNav({ active = "dashboard" }: SiteNavProps) {
     <header className="site-nav">
       <div className="site-nav-inner">
         <Link href="/" className="site-brand">
-          Deforestation Detector
+          Forest Clearing Map
         </Link>
         <nav className="site-links" aria-label="Main">
           <Link
