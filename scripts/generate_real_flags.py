@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Generate real flagged clearing polygons from Sentinel-2 NDVI change detection
-and cross-reference against ANM SIGMINE mining concessions (Pará).
+and cross-reference against mining (ANM SIGMINE) and logging (GFW) permits.
 
 Outputs:
   data/processed/flagged_sites.geojson
@@ -33,15 +33,21 @@ from src.change_detection import (
 )
 from src.config import STUDY_AREA
 from src.gee_utils import get_composite_metadata, initialize_ee, save_metadata
-from src.geo_crossref import cross_reference_geojson, download_sigmine_para, load_concessions
+from src.geo_crossref import (
+    cross_reference_geojson,
+    download_sigmine_para,
+    load_logging_concessions,
+    load_mining_concessions,
+)
 
 PROCESSED = REPO_ROOT / "data" / "processed"
 RAW = REPO_ROOT / "data" / "raw"
-CONCESSIONS_DIR = RAW / "concessions" / "anm_sigmine_pa"
+MINING_DIR = RAW / "concessions" / "anm_sigmine_pa"
+LOGGING_DIR = RAW / "concessions" / "logging"
 
 
-def write_outputs(geojson: dict, meta: dict, concessions) -> None:
-    flagged = cross_reference_geojson(geojson, concessions)
+def write_outputs(geojson: dict, meta: dict, mining, logging) -> None:
+    flagged = cross_reference_geojson(geojson, mining, logging)
 
     out_path = PROCESSED / "flagged_sites.geojson"
     with out_path.open("w", encoding="utf-8") as f:
@@ -67,7 +73,10 @@ def write_outputs(geojson: dict, meta: dict, concessions) -> None:
             "unknown": status_counts.get("unknown", 0),
         },
         "data_mode": "live",
-        "method": f"NDVI loss > {NDVI_LOSS_THRESHOLD}, min {MIN_PATCH_AREA_HA} ha, {VECTOR_SCALE_M}m",
+        "method": (
+            f"NDVI loss > {NDVI_LOSS_THRESHOLD}, min {MIN_PATCH_AREA_HA} ha, {VECTOR_SCALE_M}m; "
+            "cross-ref vs ANM SIGMINE + GFW logging"
+        ),
         "last_updated": date.today().isoformat(),
     }
 
@@ -137,13 +146,17 @@ def main() -> None:
             json.dump(geojson, f)
         print(f"  Cached raw change polygons to {raw_path}")
 
-    print("Loading ANM SIGMINE concessions for Pará...")
-    shp_path = download_sigmine_para(CONCESSIONS_DIR)
-    concessions = load_concessions(shp_path)
-    print(f"  Loaded {len(concessions)} concession polygons")
+    print("Loading ANM SIGMINE mining permits for Pará...")
+    shp_path = download_sigmine_para(MINING_DIR)
+    mining = load_mining_concessions(shp_path)
+    print(f"  Loaded {len(mining)} mining permit polygons")
 
-    print("Cross-referencing clearings vs concessions...")
-    write_outputs(geojson, meta, concessions)
+    print("Loading logging permits for study area...")
+    logging = load_logging_concessions(LOGGING_DIR, STUDY_AREA.bbox)
+    print(f"  Loaded {len(logging)} logging permit polygons")
+
+    print("Cross-referencing clearings vs mining and logging permits...")
+    write_outputs(geojson, meta, mining, logging)
 
 
 if __name__ == "__main__":

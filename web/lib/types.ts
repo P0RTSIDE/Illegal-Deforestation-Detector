@@ -12,6 +12,7 @@ export interface FlaggedSiteProperties {
   detected_year: number;
   method: string;
   notes: string;
+  matched_permit_type?: string;
 }
 
 export interface SummaryData {

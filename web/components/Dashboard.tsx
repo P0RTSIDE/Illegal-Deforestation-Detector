@@ -51,8 +51,8 @@ export default function Dashboard({
         <p>
           This map shows places where satellite images detected vegetation loss
           in the Brazilian Amazon, then checks those spots against public mining
-          permit records. Colored shapes are flagged areas, not court rulings.
-          Click any shape for details and data sources.
+          and logging permit records. Colored shapes are flagged areas, not court
+          rulings. Click any shape for details and data sources.
         </p>
         <div className="badge-row">
           <span className="badge">{summary.study_area}</span>
@@ -210,13 +210,13 @@ export default function Dashboard({
           </li>
           <li>
             <a
-              href={DATA_SOURCES.inpe_deter.url}
+              href={DATA_SOURCES.gfw_logging.url}
               target="_blank"
               rel="noopener noreferrer"
             >
-              {DATA_SOURCES.inpe_deter.name}
+              {DATA_SOURCES.gfw_logging.name}
             </a>
-            : {DATA_SOURCES.inpe_deter.role}
+            : {DATA_SOURCES.gfw_logging.role}
           </li>
         </ul>
         <p>

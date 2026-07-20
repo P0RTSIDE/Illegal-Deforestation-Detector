@@ -2,20 +2,20 @@ import type { PermitStatus } from "./types";
 
 /** Plain-language labels for the dashboard legend */
 export const STATUS_LABELS_PLAIN: Record<PermitStatus, string> = {
-  likely_unpermitted: "No permit found in public records",
+  likely_unpermitted: "No mining or logging permit found",
   likely_exceeding_permit: "May exceed permit limits",
-  likely_permitted: "Inside a registered permit area",
+  likely_permitted: "Matches a registered permit",
   unknown: "Needs review (unclear permit match)",
 };
 
 /** Short explanations shown on the dashboard */
 export const STATUS_DESCRIPTIONS: Record<PermitStatus, string> = {
   likely_unpermitted:
-    "Satellite data shows vegetation loss here, and this spot does not fall inside any mining permit shapefile from Brazil's ANM registry.",
+    "Satellite data shows vegetation loss here, and the spot does not fall inside any mining (ANM SIGMINE) or logging (GFW) permit polygon we have for this area.",
   likely_exceeding_permit:
-    "The clearing overlaps a registered permit, but the cleared area or timing may go beyond what the permit allows.",
+    "The clearing overlaps a registered mining or logging permit, but the cleared area or timing may go beyond what the permit allows.",
   likely_permitted:
-    "The clearing overlaps an active mining permit polygon in ANM SIGMINE. This may still be legal review, not proof of compliance.",
+    "The clearing overlaps an active mining or logging permit in public records. This is still not proof of full legal compliance.",
   unknown:
     "Vegetation loss was detected, but permit records are incomplete, outdated, or ambiguous for this location.",
 };
@@ -30,6 +30,16 @@ export const DATA_SOURCES = {
     name: "ANM SIGMINE mining permits (Pará)",
     url: "https://dadosabertos.anm.gov.br/SIGMINE/PROCESSOS_MINERARIOS/",
     role: "Public mining permit boundaries used for cross-reference.",
+  },
+  gfw_logging: {
+    name: "GFW managed forest (logging) concessions",
+    url: "https://data.globalforestwatch.org/datasets/gfw::logging-concessions/about",
+    role: "Logging permit boundaries compiled by Global Forest Watch.",
+  },
+  sinaflor: {
+    name: "IBAMA SINAFLOR forest authorizations (optional local layer)",
+    url: "https://www.gov.br/ibama/pt-br/assuntos/biodiversidade/flora-e-madeira/sistema-nacional-de-controle-da-origem-dos-produtos-florestais-sinaflor",
+    role: "Official forest exploitation authorizations when manually added to the pipeline.",
   },
   inpe_deter: {
     name: "INPE DETER deforestation alerts",
@@ -61,6 +71,7 @@ export interface PopupFields {
   detected_year?: number;
   method?: string;
   notes?: string;
+  matched_permit_type?: string;
 }
 
 export function buildSitePopup(props: PopupFields): string {
@@ -75,10 +86,13 @@ export function buildSitePopup(props: PopupFields): string {
   const method = props.method ?? "NDVI vegetation loss (Sentinel-2)";
   const notes = props.notes ?? "";
   const name = props.name ?? "Detected clearing";
+  const permitMatch = props.matched_permit_type ?? "none";
 
   const sources = [
     DATA_SOURCES.sentinel2,
     DATA_SOURCES.anm_sigmine,
+    DATA_SOURCES.gfw_logging,
+    permitMatch.includes("logging") ? DATA_SOURCES.sinaflor : null,
     status === "likely_unpermitted" || status === "unknown"
       ? DATA_SOURCES.inpe_deter
       : null,
@@ -101,11 +115,12 @@ export function buildSitePopup(props: PopupFields): string {
         <li><strong>Cleared area:</strong> ${area}</li>
         <li><strong>Change detected around:</strong> ${year}</li>
         <li><strong>Detection method:</strong> ${method}</li>
+        <li><strong>Permit match:</strong> ${permitMatch}</li>
       </ul>
       ${notes ? `<p class="site-popup-notes"><strong>Notes:</strong> ${notes}</p>` : ""}
       <p class="site-popup-sources-title"><strong>Where this comes from</strong></p>
       <ul class="site-popup-sources">${sourceLinks}</ul>
-      <p class="site-popup-fine-print">Flags are based on public records and satellite analysis. They are not proof of a crime or a final legal finding.</p>
+      <p class="site-popup-fine-print">Flags use public satellite imagery plus mining and logging permit databases. They are not proof of a crime or a final legal finding.</p>
     </div>
   `;
 }

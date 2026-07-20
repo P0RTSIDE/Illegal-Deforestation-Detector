@@ -15,6 +15,9 @@ const SOURCE_LINKS = {
   deter: "https://terrabrasilis.dpi.inpe.br/downloads/",
   hansen: "https://storage.googleapis.com/earthengine-stac/catalog/UMD_hansen_global_forest_change_2023_v1.json",
   gfw: "https://data.globalforestwatch.org/",
+  gfw_logging: "https://data.globalforestwatch.org/datasets/gfw::logging-concessions/about",
+  sinaflor:
+    "https://www.gov.br/ibama/pt-br/assuntos/biodiversidade/flora-e-madeira/sistema-nacional-de-controle-da-origem-dos-produtos-florestais-sinaflor",
 };
 
 export default function MethodologyPage() {
@@ -25,10 +28,10 @@ export default function MethodologyPage() {
         <section className="hero">
           <h1>Methodology</h1>
           <p>
-            This page documents the full technical pipeline. The{" "}
-            <Link href="/">dashboard</Link> uses plain language; this page is
-            for reviewers, researchers, and hiring managers who want implementation
-            detail.
+            This page documents the full technical pipeline behind the flagged
+            sites, from satellite imagery to permit cross-referencing. For a
+            quick overview of the results, see the{" "}
+            <Link href="/">dashboard</Link>.
           </p>
         </section>
 
@@ -69,12 +72,19 @@ export default function MethodologyPage() {
         <section className="card methodology-block">
           <h2>2. Preprocessing</h2>
           <ul className="method-list">
-            <li>Cloud/shadow masking on each scene before compositing</li>
-            <li>Reflectance normalization for model input</li>
             <li>
-              Tiling large rasters into fixed-size patches (e.g. 256×256) with
-              georeferencing metadata preserved for mapping results back to
-              coordinates
+              Clouds and their shadows are removed from each image before the
+              yearly composite is built, so passing weather is not mistaken for
+              change on the ground.
+            </li>
+            <li>
+              Pixel brightness values are rescaled to a common range so the two
+              years can be compared on equal footing.
+            </li>
+            <li>
+              Each large image is cut into fixed-size tiles (for example, 256 by
+              256 pixels). Every tile keeps its map coordinates, so any change
+              found in a tile can be traced back to a real location on the map.
             </li>
           </ul>
         </section>
@@ -118,11 +128,35 @@ export default function MethodologyPage() {
           <h2>4. Concession cross-referencing</h2>
           <p>
             This is the differentiating step. Change masks are converted to vector
-            polygons (raster-to-vector), then spatially joined against{" "}
-            <a href={SOURCE_LINKS.anm} target="_blank" rel="noopener noreferrer">
-              ANM SIGMINE
-            </a>{" "}
-            mining permit polygons for Pará using geopandas.
+            polygons (raster-to-vector), then spatially joined against public
+            permit layers using geopandas:
+          </p>
+          <ul className="method-list">
+            <li>
+              <strong>Mining:</strong>{" "}
+              <a href={SOURCE_LINKS.anm} target="_blank" rel="noopener noreferrer">
+                ANM SIGMINE
+              </a>{" "}
+              mineral process polygons for Pará (daily-updated open data)
+            </li>
+            <li>
+              <strong>Logging:</strong>{" "}
+              <a
+                href={SOURCE_LINKS.gfw_logging}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                GFW managed forest concessions
+              </a>{" "}
+              clipped to the study bbox via ArcGIS REST, plus optional local
+              SINAFLOR shapefiles dropped in{" "}
+              <code>data/raw/concessions/logging/sinaflor/</code>
+            </li>
+          </ul>
+          <p>
+            Each clearing centroid is checked against mining first, then logging.
+            The output includes <code>matched_permit_type</code> (mining, logging,
+            both, or none).
           </p>
 
           <div className="status-table-wrap">
@@ -144,7 +178,8 @@ export default function MethodologyPage() {
                 <tr>
                   <td>Likely unpermitted</td>
                   <td>
-                    Centroid outside all concession boundaries in public records
+                    Centroid outside all mining and logging permit boundaries in
+                    public records for this study area
                   </td>
                 </tr>
                 <tr>
@@ -224,7 +259,24 @@ export default function MethodologyPage() {
                 </tr>
                 <tr>
                   <td>Logging permits</td>
-                  <td>IBAMA SINAFLOR / GFW</td>
+                  <td>
+                    <a
+                      href={SOURCE_LINKS.gfw_logging}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      GFW managed forest concessions
+                    </a>{" "}
+                    (primary for this pipeline), optional{" "}
+                    <a
+                      href={SOURCE_LINKS.sinaflor}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      IBAMA SINAFLOR
+                    </a>{" "}
+                    shapefiles
+                  </td>
                   <td>Permit boundaries</td>
                 </tr>
                 <tr>

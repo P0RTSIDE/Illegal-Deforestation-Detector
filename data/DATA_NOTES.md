@@ -170,18 +170,20 @@ https://terrabrasilis.dpi.inpe.br/geoserver/deter-amz/wfs
 
 ---
 
-## 7. Cross-reference logic (preview)
+## 7. Cross-reference logic (implemented in `src/geo_crossref.py`)
 
-Each detected change polygon will be classified heuristically:
+Each detected change polygon is classified heuristically against **mining** (ANM SIGMINE) and **logging** (GFW + optional SINAFLOR):
 
 | Status | Rule |
 |--------|------|
-| `likely_permitted` | Centroid inside active SIGMINE polygon with matching phase (e.g., "LAVRA") |
-| `likely_unpermitted` | Centroid outside all concession polygons |
-| `likely_exceeding_permit` | Inside concession but area > registered limit, or change date outside permit window |
-| `unknown` | Incomplete registry data or ambiguous geometry overlap |
+| `likely_permitted` | Centroid inside an active mining permit (SIGMINE phase match) or inside an active GFW logging concession |
+| `likely_unpermitted` | Centroid outside all mining and logging permit polygons loaded for the study area |
+| `likely_exceeding_permit` | Inside a permit but cleared area exceeds registered limit (when area field is present) |
+| `unknown` | Partial overlap, inactive permit status, or ambiguous registry metadata |
 
-**This is not a legal determination.** Public concession registries are incomplete and often stale. Flagged sites mean "not accounted for in available public records," not proven illegality.
+Additional output field: `matched_permit_type` = `mining`, `logging`, `mining+logging`, or `none`.
+
+**This is not a legal determination.** Public concession registries are incomplete and often stale. GFW logging coverage for Brazil may lag IBAMA SINAFLOR. Flagged sites mean "not accounted for in available public records," not proven illegality.
 
 ---
 
@@ -190,7 +192,8 @@ Each detected change polygon will be classified heuristically:
 | Path | Source | Date pulled | Notes |
 |------|--------|-------------|-------|
 | `data/raw/gee_metadata.json` | GEE API | (auto) | Collection size sanity check |
-| `data/raw/concessions/anm_sigmine_pa/` | ANM | | |
-| `data/raw/concessions/gfw/` | GFW | | |
+| `data/raw/concessions/anm_sigmine_pa/` | ANM | | Mining permits (Pará) |
+| `data/raw/concessions/logging/gfw_logging_aoi.geojson` | GFW ArcGIS REST | | Logging concessions clipped to AOI |
+| `data/raw/concessions/logging/sinaflor/` | IBAMA SINAFLOR | | Optional manual shapefile drop |
 | `data/raw/validation/deter/` | INPE | | |
 | `data/raw/validation/hansen/` | UMD/GFW | | |

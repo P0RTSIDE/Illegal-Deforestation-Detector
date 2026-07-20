@@ -19,6 +19,6 @@
     "unknown": 228
   },
   "data_mode": "live",
-  "method": "NDVI loss > 0.18, min 5.0 ha, 30m",
-  "last_updated": "2026-07-06"
+  "method": "NDVI loss > 0.18, min 5.0 ha, 30m; cross-ref vs ANM SIGMINE + GFW logging",
+  "last_updated": "2026-07-11"
 }
