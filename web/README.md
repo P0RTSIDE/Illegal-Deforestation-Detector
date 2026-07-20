@@ -27,26 +27,16 @@ This updates `summary.json` from `data/raw/gee_metadata.json` and replaces `flag
 
 ## Deploy to Vercel
 
-### Fix: "No python entrypoint found"
+Set the project's **Root Directory** to `web` so Vercel builds this Next.js app rather than the Python code at the repo root. The framework should be detected as **Next.js**, and no Python environment variables are needed.
 
-That error means Vercel is trying to deploy the **Python repo root** (`requirements.txt`) instead of this Next.js app.
-
-**Do this:**
-
-1. Vercel dashboard → your project → **Settings** → **General**
-2. **Root Directory** → set to `web` → **Save**
-3. **Deployments** → latest failed deploy → **Redeploy**
-
-Framework should show **Next.js**. No Python env vars needed.
-
-### Option A — Vercel dashboard (recommended)
+### Option A: Vercel dashboard (recommended)
 
 1. Push repo to GitHub.
-2. [vercel.com/new](https://vercel.com/new) → Import repository.
+2. Import the repository at [vercel.com/new](https://vercel.com/new).
 3. Set **Root Directory** to `web` before deploying.
 4. Deploy.
 
-### Option B — CLI
+### Option B: CLI
 
 ```bash
 cd web
@@ -67,6 +57,6 @@ Demo polygons ship by default. Replace with real outputs via `export_for_web.py`
 
 ## Map layers
 
-- **Esri World Imagery** (default) — good for before/after context
-- **OpenStreetMap** — toggle in layer control
+- **Esri World Imagery** (default): good for before/after context
+- **OpenStreetMap**: toggle in layer control
 - Click polygons for site details popup

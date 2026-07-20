@@ -2,11 +2,11 @@
 
 Portfolio project combining **Sentinel-2 change detection** with **public concession/permit cross-referencing** to flag likely unpermitted land clearing in the Brazilian Amazon.
 
-> **Important:** This system produces *heuristic flags* based on incomplete public records. "Outside a concession boundary" means "not accounted for in available registries" — not proven illegality. See limitations in `reports/writeup.md` (coming) and `data/DATA_NOTES.md`.
+> **Important:** This system produces *heuristic flags* based on incomplete public records. "Outside a concession boundary" means "not accounted for in available registries", not proven illegality. See limitations in `reports/writeup.md` (coming) and `data/DATA_NOTES.md`.
 
 ## Study area
 
-**Southern Pará (Novo Progresso corridor)** — a ~55 × 45 km pilot AOI with high DETER alert density and documented illegal mining pressure.
+**Southern Pará (Novo Progresso corridor)**: a ~55 × 45 km pilot AOI with high DETER alert density and documented illegal mining pressure.
 
 | Parameter | Value |
 |-----------|-------|
@@ -101,7 +101,7 @@ deforestation-detector/
 
 ## Web dashboard (Vercel)
 
-The portfolio site lives in **`web/`** — a Next.js app with an interactive satellite map and flagged-site popups. Vercel hosts the visualization; the Python pipeline runs locally and feeds it pre-computed GeoJSON.
+The portfolio site lives in **`web/`**, a Next.js app with an interactive satellite map and flagged-site popups. Vercel hosts the visualization; the Python pipeline runs locally and feeds it pre-computed GeoJSON.
 
 ```bash
 # Preview locally
@@ -115,21 +115,11 @@ npm run dev
 python scripts/export_for_web.py
 ```
 
-**Deploy:** Push to GitHub → [vercel.com/new](https://vercel.com/new) → import repo.
-
-**Important — fix "No python entrypoint found" error:**
-
-Vercel must deploy the **`web/`** folder (Next.js), not the repo root (Python).
-
-1. Vercel project → **Settings** → **General**
-2. **Root Directory** → Edit → enter `web` → Save
-3. **Redeploy** (Deployments → ⋯ → Redeploy)
-
-Alternatively, the repo includes a root `vercel.json` that builds `web/` via npm — but setting Root Directory to `web` is the most reliable fix.
+**Deploy:** Push to GitHub and import the repo at [vercel.com/new](https://vercel.com/new). Set the project's Root Directory to `web` so Vercel builds the Next.js dashboard rather than the Python code at the repo root.
 
 See `web/README.md` for local dev.
 
-The map currently shows **demo polygons** until you run change detection + `export_for_web.py` with real `flagged_sites.geojson`.
+The map shows demo polygons until real change detection results are generated and synced with `export_for_web.py`.
 
 ## What to do next (ML pipeline)
 
@@ -139,18 +129,18 @@ The map currently shows **demo polygons** until you run change detection + `expo
 | 2 | Export image composites | `python scripts/test_gee_pull.py --export-drive` |
 | 3 | Download ANM SIGMINE Pará | See `data/DATA_NOTES.md` → `data/raw/concessions/` |
 | 4 | Preprocess + tile rasters | Notebook `02_preprocessing_and_tiling.ipynb` |
-| 5 | Baseline NDVI/NBR change map | Before any CNN — interpretable baseline |
+| 5 | Baseline NDVI/NBR change map | Before any CNN, interpretable baseline |
 | 6 | Concession spatial join | `geo_crossref.py` / notebook 04 |
 | 7 | Push results to website | `python scripts/export_for_web.py` → redeploy Vercel |
 
 ## Methodology (build order)
 
-1. **Data acquisition** — GEE Sentinel-2 before/after median composites ✅
-2. **Preprocessing** — cloud masking, tiling, normalization ← **you are here**
-3. **Change detection** — spectral index baseline (NDVI/NBR diff) *then* learned Siamese/U-Net
-4. **Concession cross-reference** — spatial join detected polygons vs ANM SIGMINE / GFW layers
-5. **Validation** — DETER/PRODES + Hansen sanity checks
-6. **Output** — sync results to web dashboard + deploy to Vercel
+1. **Data acquisition**: GEE Sentinel-2 before/after median composites
+2. **Preprocessing**: cloud masking, tiling, normalization
+3. **Change detection**: spectral index baseline (NDVI/NBR diff), then learned Siamese/U-Net
+4. **Concession cross-reference**: spatial join detected polygons vs ANM SIGMINE / GFW layers
+5. **Validation**: DETER/PRODES plus Hansen sanity checks
+6. **Output**: sync results to web dashboard and deploy to Vercel
 
 ## Data sources (summary)
 
@@ -175,4 +165,4 @@ Full download steps and licensing: **`data/DATA_NOTES.md`**.
 ## License
 
 Code: MIT (add `LICENSE` file before publishing).  
-Data: each source has its own license — see `data/DATA_NOTES.md`.
+Data: each source has its own license, see `data/DATA_NOTES.md`.
