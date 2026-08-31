@@ -1,4 +1,4 @@
-import type { PermitStatus } from "./types";
+import type { ParkProperties, PermitStatus } from "./types";
 
 /** Plain-language labels for the dashboard legend */
 export const STATUS_LABELS_PLAIN: Record<PermitStatus, string> = {
@@ -121,6 +121,24 @@ export function buildSitePopup(props: PopupFields): string {
       <p class="site-popup-sources-title"><strong>Where this comes from</strong></p>
       <ul class="site-popup-sources">${sourceLinks}</ul>
       <p class="site-popup-fine-print">Flags use public satellite imagery plus mining and logging permit databases. They are not proof of a crime or a final legal finding.</p>
+    </div>
+  `;
+}
+
+export function buildParkPopup(props: ParkProperties): string {
+  return `
+    <div class="site-popup">
+      <strong class="site-popup-title">${props.name}</strong>
+      <p class="site-popup-status"><span class="site-popup-tag">${props.threat_label}</span></p>
+      <p class="site-popup-text">${props.description}</p>
+      <ul class="site-popup-facts">
+        <li><strong>Location:</strong> ${props.state}</li>
+      </ul>
+      <p class="site-popup-sources-title"><strong>Where this comes from</strong></p>
+      <ul class="site-popup-sources">
+        <li><a href="${props.source_url}" target="_blank" rel="noopener noreferrer">National Park Service park page</a></li>
+      </ul>
+      <p class="site-popup-fine-print">These are protected areas with documented illegal mining or logging pressure, shown here for context. This reference layer is separate from the satellite analysis of the Amazon study area.</p>
     </div>
   `;
 }

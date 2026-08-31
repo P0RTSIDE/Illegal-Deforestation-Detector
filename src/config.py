@@ -26,11 +26,11 @@ class StudyArea:
 SOUTHERN_PARA = StudyArea(
     name="Southern Pará (Novo Progresso corridor)",
     description=(
-        "Pilot AOI along the BR-163 highway south of Novo Progresso, Pará. "
+        "Expanded AOI along the BR-163 highway around Novo Progresso, Pará. "
         "Frequent DETER alerts and documented illegal mining (e.g., Morro dos "
-        "Garimpeiros). ~115 km × 95 km extent."
+        "Garimpeiros). ~265 km × 245 km extent."
     ),
-    bbox=(-56.30, -7.90, -55.25, -7.05),
+    bbox=(-57.00, -8.60, -54.60, -6.40),
     before_year=2019,
     after_year=2023,
 )

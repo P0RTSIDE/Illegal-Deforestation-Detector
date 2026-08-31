@@ -90,10 +90,8 @@ def export_live_flagged_sites() -> None:
 
 
 def export_study_area() -> None:
-    """Write study-area boundary from config if not already present."""
+    """Write study-area boundary from config, keeping it in sync on each run."""
     dst = WEB_DATA / "study-area.geojson"
-    if dst.exists():
-        return
 
     sys.path.insert(0, str(REPO_ROOT))
     from src.config import STUDY_AREA

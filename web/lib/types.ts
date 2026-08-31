@@ -43,3 +43,19 @@ export const STATUS_LABELS: Record<PermitStatus, string> = {
   likely_permitted: "Likely permitted",
   unknown: "Unknown / incomplete registry",
 };
+
+export type ParkThreat = "mining" | "logging";
+
+export interface ParkProperties {
+  name: string;
+  state: string;
+  threat: ParkThreat;
+  threat_label: string;
+  description: string;
+  source_url: string;
+}
+
+export const PARK_THREAT_COLORS: Record<ParkThreat, string> = {
+  mining: "#f59e0b",
+  logging: "#a855f7",
+};

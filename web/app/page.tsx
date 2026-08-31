@@ -12,10 +12,11 @@ async function loadJson<T>(filename: string): Promise<T> {
 }
 
 export default async function HomePage() {
-  const [summary, studyArea, flaggedSites] = await Promise.all([
+  const [summary, studyArea, flaggedSites, usParks] = await Promise.all([
     loadJson<SummaryData>("summary.json"),
     loadJson<FeatureCollection>("study-area.geojson"),
     loadJson<FeatureCollection>("flagged-sites.geojson"),
+    loadJson<FeatureCollection>("us-parks.geojson"),
   ]);
 
   return (
@@ -26,6 +27,7 @@ export default async function HomePage() {
           summary={summary}
           studyArea={studyArea}
           flaggedSites={flaggedSites}
+          usParks={usParks}
         />
       </main>
     </>

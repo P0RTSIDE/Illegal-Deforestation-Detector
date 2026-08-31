@@ -1,0 +1,110 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Redwood National and State Parks",
+        "state": "California",
+        "threat": "logging",
+        "threat_label": "Illegal logging",
+        "description": "Old-growth redwoods here have been targeted by illegal logging and burl poaching, where sections are cut from living trees to sell as wood carvings.",
+        "source_url": "https://www.nps.gov/redw/index.htm"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-124.0046, 41.2132]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Olympic National Park",
+        "state": "Washington",
+        "threat": "logging",
+        "threat_label": "Illegal logging",
+        "description": "Protected old-growth cedar and bigleaf maple have been targeted by timber poaching, with trees felled inside park and adjacent forest boundaries and sold on the black market.",
+        "source_url": "https://www.nps.gov/olym/index.htm"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-123.6044, 47.8021]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Death Valley National Park",
+        "state": "California / Nevada",
+        "threat": "mining",
+        "threat_label": "Illegal mining",
+        "description": "A long mining history left many abandoned claims. The park continues to deal with unauthorized digging and disturbance at legacy mineral sites.",
+        "source_url": "https://www.nps.gov/deva/index.htm"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-116.9325, 36.5323]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Mojave National Preserve",
+        "state": "California",
+        "threat": "mining",
+        "threat_label": "Illegal mining",
+        "description": "The preserve contains many old mining claims and sees unauthorized mineral prospecting and disturbance across its desert lands.",
+        "source_url": "https://www.nps.gov/moja/index.htm"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-115.51, 35.14]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Sequoia and Kings Canyon National Parks",
+        "state": "California",
+        "threat": "logging",
+        "threat_label": "Illegal clearing",
+        "description": "Remote groves have been cleared for illegal cannabis cultivation, which damages forest, diverts streams, and leaves behind chemicals and waste.",
+        "source_url": "https://www.nps.gov/seki/index.htm"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.5658, 36.4864]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Wrangell-St. Elias National Park and Preserve",
+        "state": "Alaska",
+        "threat": "mining",
+        "threat_label": "Illegal mining",
+        "description": "This park surrounds historic mining districts such as Kennecott. Active and abandoned claims create ongoing pressure from unauthorized mineral extraction.",
+        "source_url": "https://www.nps.gov/wrst/index.htm"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-142.0, 61.0]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Great Smoky Mountains National Park",
+        "state": "Tennessee / North Carolina",
+        "threat": "logging",
+        "threat_label": "Illegal harvesting",
+        "description": "Beyond wildlife poaching, the park faces illegal harvesting of forest products such as ginseng and galax, removing protected plants for sale.",
+        "source_url": "https://www.nps.gov/grsm/index.htm"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-83.507, 35.6532]
+      }
+    }
+  ]
+}

@@ -260,6 +260,43 @@ footer {
   margin: 0 0 0.75rem;
 }
 
+.region-switch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.85rem;
+}
+
+.region-btn {
+  appearance: none;
+  cursor: pointer;
+  padding: 0.5rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 0.88rem;
+  font-family: inherit;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+
+.region-btn:hover {
+  color: var(--text);
+  border-color: var(--info);
+}
+
+.region-btn.active {
+  background: rgba(56, 189, 248, 0.16);
+  border-color: var(--info);
+  color: var(--text);
+  font-weight: 600;
+}
+
+.swatch-dot {
+  border-radius: 999px;
+  border: 1px solid #0b1220;
+}
+
 .how-to-read {
   margin-bottom: 1.25rem;
 }

@@ -2,9 +2,11 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import { useState } from "react";
 import type { FeatureCollection } from "geojson";
 import type { SummaryData } from "@/lib/types";
 import { STATUS_COLORS, type PermitStatus } from "@/lib/types";
+import type { MapRegion } from "@/components/StudyMap";
 import {
   STATUS_LABELS_PLAIN,
   STATUS_DESCRIPTIONS,
@@ -32,13 +34,17 @@ interface DashboardProps {
   summary: SummaryData;
   studyArea: FeatureCollection;
   flaggedSites: FeatureCollection;
+  usParks: FeatureCollection;
 }
 
 export default function Dashboard({
   summary,
   studyArea,
   flaggedSites,
+  usParks,
 }: DashboardProps) {
+  const [region, setRegion] = useState<MapRegion>("brazil");
+
   const center: [number, number] = [
     (summary.bbox[1] + summary.bbox[3]) / 2,
     (summary.bbox[0] + summary.bbox[2]) / 2,
@@ -108,14 +114,36 @@ export default function Dashboard({
         <div className="card">
           <h2>Interactive map</h2>
           <p className="card-intro">
-            Use the layer control (top right) to switch between satellite and
-            street map views. Zoom in to inspect individual sites.
+            Use the buttons below to move between the Amazon study area and a
+            reference layer of US protected parks with illegal mining or logging
+            pressure. Use the layer control (top right) to switch base maps or
+            hide a layer, and zoom in to inspect individual sites.
           </p>
+          <div className="region-switch" role="group" aria-label="Map region">
+            <button
+              type="button"
+              className={`region-btn${region === "brazil" ? " active" : ""}`}
+              onClick={() => setRegion("brazil")}
+              aria-pressed={region === "brazil"}
+            >
+              Brazil: Amazon study area
+            </button>
+            <button
+              type="button"
+              className={`region-btn${region === "usa" ? " active" : ""}`}
+              onClick={() => setRegion("usa")}
+              aria-pressed={region === "usa"}
+            >
+              US: protected parks
+            </button>
+          </div>
           <StudyMap
             studyArea={studyArea}
             flaggedSites={flaggedSites}
+            usParks={usParks}
             center={center}
             bbox={summary.bbox}
+            region={region}
           />
         </div>
       </section>
@@ -179,6 +207,28 @@ export default function Dashboard({
               <p className="legend-desc">
                 The region covered by this analysis. The map zooms to this box
                 on load.
+              </p>
+            </div>
+            <div className="legend-block">
+              <div className="legend-item">
+                <span
+                  className="swatch swatch-dot"
+                  style={{ background: "#f59e0b" }}
+                />
+                <strong>US park: illegal mining</strong>
+              </div>
+              <div className="legend-item">
+                <span
+                  className="swatch swatch-dot"
+                  style={{ background: "#a855f7" }}
+                />
+                <strong>US park: illegal logging</strong>
+              </div>
+              <p className="legend-desc">
+                Dots mark US protected areas with documented illegal mining or
+                logging pressure. This is a reference layer for context, not part
+                of the Amazon satellite analysis. Switch to the US view or use
+                the layer control to show them.
               </p>
             </div>
           </div>
