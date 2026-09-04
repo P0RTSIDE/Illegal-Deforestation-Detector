@@ -113,6 +113,18 @@ export default function MethodologyPage() {
             sample can miss still appear. In Brazil, patches smaller than 2
             hectares are dropped. Inside US parks the floor is 0.5 hectares.
           </p>
+          <p>
+            The satellite photo shows how the land looks now. The colored shapes
+            do not. A pixel is tagged only if it had tree cover and then lost
+            that canopy in 2019 to 2023. This study area is wet tropical forest,
+            so yellow or tan ground is usually exposed soil, pasture, or a road,
+            not a naturally dry climate. An older clearing can look bare and
+            bright and still stay untagged if the trees came down before 2019.
+            A newer clearing can look mottled brown and slightly green as grass
+            grows back, and still be tagged because the forest loss happened
+            inside the study years. Mixed 30 m pixels at the forest edge can
+            also pull a little intact canopy into a shape.
+          </p>
 
           <h3>Learned model: Siamese / early-fusion U-Net (planned)</h3>
           <p>

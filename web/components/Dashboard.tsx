@@ -122,6 +122,14 @@ export default function Dashboard({
             pressure. Use the layer control (top right) to switch base maps or
             hide a layer, and zoom in to inspect individual sites.
           </p>
+          <p className="map-note">
+            Bare, yellow, or dry-looking ground is not tagged just because it
+            looks cleared today. Shapes mark tree cover that was lost between{" "}
+            {summary.before_year} and {summary.after_year}. Older fields, roads,
+            and clearings from before {summary.before_year} can stay untagged,
+            even when they look more barren than a newer patch that still has
+            some grass.
+          </p>
           <div className="region-switch" role="group" aria-label="Map region">
             <button
               type="button"

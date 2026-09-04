@@ -260,6 +260,17 @@ footer {
   margin: 0 0 0.75rem;
 }
 
+.map-note {
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.45;
+  margin: 0 0 0.85rem;
+  padding: 0.65rem 0.8rem;
+  border-left: 3px solid var(--info);
+  background: rgba(56, 189, 248, 0.08);
+  border-radius: 0 8px 8px 0;
+}
+
 .region-switch {
   display: flex;
   flex-wrap: wrap;
