@@ -1,8 +1,7 @@
 """
 Study-area configuration for the Brazilian Amazon pilot.
 
-All coordinates are WGS84 (EPSG:4326). The test bounding box is intentionally
-small (~400 km²) so the first GEE export completes quickly.
+All coordinates are WGS84 (EPSG:4326).
 """
 
 from __future__ import annotations

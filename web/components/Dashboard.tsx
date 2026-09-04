@@ -35,6 +35,7 @@ interface DashboardProps {
   studyArea: FeatureCollection;
   flaggedSites: FeatureCollection;
   usParks: FeatureCollection;
+  parkClearings: FeatureCollection;
 }
 
 export default function Dashboard({
@@ -42,8 +43,10 @@ export default function Dashboard({
   studyArea,
   flaggedSites,
   usParks,
+  parkClearings,
 }: DashboardProps) {
   const [region, setRegion] = useState<MapRegion>("brazil");
+  const parkClearingCount = parkClearings.features.length;
 
   const center: [number, number] = [
     (summary.bbox[1] + summary.bbox[3]) / 2,
@@ -141,6 +144,7 @@ export default function Dashboard({
             studyArea={studyArea}
             flaggedSites={flaggedSites}
             usParks={usParks}
+            parkClearings={parkClearings}
             center={center}
             bbox={summary.bbox}
             region={region}
@@ -163,12 +167,28 @@ export default function Dashboard({
               </div>
             </div>
             <div className="stat">
-              <div className="label">Satellite scenes ({summary.before_year})</div>
-              <div className="value">{summary.before_image_count}</div>
+              <div className="label">
+                {(summary.method ?? "").toLowerCase().includes("hansen")
+                  ? "Change source"
+                  : `Satellite scenes (${summary.before_year})`}
+              </div>
+              <div className="value">
+                {(summary.method ?? "").toLowerCase().includes("hansen")
+                  ? "Hansen GFC"
+                  : summary.before_image_count}
+              </div>
             </div>
             <div className="stat">
-              <div className="label">Satellite scenes ({summary.after_year})</div>
-              <div className="value">{summary.after_image_count}</div>
+              <div className="label">
+                {(summary.method ?? "").toLowerCase().includes("hansen")
+                  ? "Loss years"
+                  : `Satellite scenes (${summary.after_year})`}
+              </div>
+              <div className="value">
+                {(summary.method ?? "").toLowerCase().includes("hansen")
+                  ? `${summary.before_year} to ${summary.after_year}`
+                  : summary.after_image_count}
+              </div>
             </div>
           </div>
         </div>
@@ -226,9 +246,9 @@ export default function Dashboard({
               </div>
               <p className="legend-desc">
                 Dots mark US protected areas with documented illegal mining or
-                logging pressure. This is a reference layer for context, not part
-                of the Amazon satellite analysis. Switch to the US view or use
-                the layer control to show them.
+                logging pressure. Red shapes show {parkClearingCount} tree-cover
+                loss patches detected inside those park boundaries. Switch to the
+                US view or use the layer control to show them.
               </p>
             </div>
           </div>
@@ -267,6 +287,16 @@ export default function Dashboard({
               {DATA_SOURCES.gfw_logging.name}
             </a>
             : {DATA_SOURCES.gfw_logging.role}
+          </li>
+          <li>
+            <a
+              href={DATA_SOURCES.hansen.url}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {DATA_SOURCES.hansen.name}
+            </a>
+            : {DATA_SOURCES.hansen.role}
           </li>
         </ul>
         <p>

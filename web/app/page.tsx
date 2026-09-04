@@ -12,12 +12,14 @@ async function loadJson<T>(filename: string): Promise<T> {
 }
 
 export default async function HomePage() {
-  const [summary, studyArea, flaggedSites, usParks] = await Promise.all([
-    loadJson<SummaryData>("summary.json"),
-    loadJson<FeatureCollection>("study-area.geojson"),
-    loadJson<FeatureCollection>("flagged-sites.geojson"),
-    loadJson<FeatureCollection>("us-parks.geojson"),
-  ]);
+  const [summary, studyArea, flaggedSites, usParks, parkClearings] =
+    await Promise.all([
+      loadJson<SummaryData>("summary.json"),
+      loadJson<FeatureCollection>("study-area.geojson"),
+      loadJson<FeatureCollection>("flagged-sites.geojson"),
+      loadJson<FeatureCollection>("us-parks.geojson"),
+      loadJson<FeatureCollection>("park-clearings.geojson"),
+    ]);
 
   return (
     <>
@@ -28,6 +30,7 @@ export default async function HomePage() {
           studyArea={studyArea}
           flaggedSites={flaggedSites}
           usParks={usParks}
+          parkClearings={parkClearings}
         />
       </main>
     </>

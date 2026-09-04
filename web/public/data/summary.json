@@ -10,15 +10,15 @@
   "after_year": 2023,
   "before_image_count": 359,
   "after_image_count": 332,
-  "total_flagged_sites": 250,
-  "total_flagged_area_ha": 14907.8,
+  "total_flagged_sites": 1200,
+  "total_flagged_area_ha": 333655.4,
   "by_status": {
-    "likely_unpermitted": 6,
-    "likely_exceeding_permit": 0,
-    "likely_permitted": 16,
-    "unknown": 228
+    "likely_unpermitted": 61,
+    "likely_exceeding_permit": 19,
+    "likely_permitted": 245,
+    "unknown": 875
   },
   "data_mode": "live",
-  "method": "NDVI loss > 0.18, min 5.0 ha, 30m; cross-ref vs ANM SIGMINE + GFW logging",
-  "last_updated": "2026-07-11"
+  "method": "Hansen Global Forest Change tree-cover loss 2019-2023, 30 m, min 2.0 ha; cross-ref vs ANM SIGMINE + GFW logging",
+  "last_updated": "2026-09-03"
 }

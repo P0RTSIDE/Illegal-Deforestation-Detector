@@ -59,3 +59,14 @@ export const PARK_THREAT_COLORS: Record<ParkThreat, string> = {
   mining: "#f59e0b",
   logging: "#a855f7",
 };
+
+export interface ParkClearingProperties {
+  id?: string;
+  name?: string;
+  park_name: string;
+  park_unit: string;
+  threat: ParkThreat;
+  area_ha?: number;
+  detected_year?: number;
+  boundary_clipped?: boolean;
+}

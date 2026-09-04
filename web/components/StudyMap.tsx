@@ -15,8 +15,13 @@ import {
   PARK_THREAT_COLORS,
   type FlaggedSiteProperties,
   type ParkProperties,
+  type ParkClearingProperties,
 } from "@/lib/types";
-import { buildSitePopup, buildParkPopup } from "@/lib/copy";
+import {
+  buildSitePopup,
+  buildParkPopup,
+  buildParkClearingPopup,
+} from "@/lib/copy";
 
 import "leaflet/dist/leaflet.css";
 
@@ -26,6 +31,7 @@ interface MapProps {
   studyArea: FeatureCollection;
   flaggedSites: FeatureCollection;
   usParks: FeatureCollection;
+  parkClearings: FeatureCollection;
   center: [number, number];
   bbox: [number, number, number, number];
   region: MapRegion;
@@ -70,6 +76,7 @@ export default function StudyMap({
   studyArea,
   flaggedSites,
   usParks,
+  parkClearings,
   center,
   bbox,
   region,
@@ -151,6 +158,23 @@ export default function StudyMap({
             onEachFeature={(feature, layer) => {
               const props = feature.properties as ParkProperties;
               layer.bindPopup(buildParkPopup(props), { maxWidth: 320 });
+            }}
+          />
+        </LayersControl.Overlay>
+
+        <LayersControl.Overlay checked name="US park clearings (detected)">
+          <GeoJSON
+            key={`park-clearings-${parkClearings.features.length}`}
+            data={parkClearings}
+            style={{
+              color: "#ef4444",
+              weight: 2.5,
+              fillColor: "#ef4444",
+              fillOpacity: 0.45,
+            }}
+            onEachFeature={(feature, layer) => {
+              const props = feature.properties as ParkClearingProperties;
+              layer.bindPopup(buildParkClearingPopup(props), { maxWidth: 320 });
             }}
           />
         </LayersControl.Overlay>

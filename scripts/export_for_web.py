@@ -89,6 +89,21 @@ def export_live_flagged_sites() -> None:
     print("No live flagged_sites.geojson found — keeping demo map data.")
 
 
+def export_park_clearings() -> None:
+    """Copy detected US park clearings, or ensure an empty overlay exists."""
+    src = PROCESSED / "park_clearings.geojson"
+    dst = WEB_DATA / "park-clearings.geojson"
+
+    if src.exists():
+        shutil.copy2(src, dst)
+        print(f"Copied {src} -> {dst}")
+    elif not dst.exists():
+        WEB_DATA.mkdir(parents=True, exist_ok=True)
+        with dst.open("w", encoding="utf-8") as f:
+            json.dump({"type": "FeatureCollection", "features": []}, f)
+        print(f"Wrote empty {dst} (run generate_park_flags.py for real detections)")
+
+
 def export_study_area() -> None:
     """Write study-area boundary from config, keeping it in sync on each run."""
     dst = WEB_DATA / "study-area.geojson"
@@ -132,6 +147,7 @@ def main() -> None:
     export_study_area()
     export_gee_metadata()
     export_live_flagged_sites()
+    export_park_clearings()
     print("\nWeb data export complete. Deploy with: cd web && npm run build")
 
 

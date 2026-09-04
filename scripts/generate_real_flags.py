@@ -26,6 +26,7 @@ from dotenv import load_dotenv
 
 from src.change_detection import (
     MIN_PATCH_AREA_HA,
+    NBR_LOSS_THRESHOLD,
     NDVI_LOSS_THRESHOLD,
     VECTOR_SCALE_M,
     change_polygons_fc,
@@ -33,6 +34,8 @@ from src.change_detection import (
 )
 from src.config import STUDY_AREA
 from src.gee_utils import get_composite_metadata, initialize_ee, save_metadata
+from src.hansen_change import METHOD_LABEL as HANSEN_METHOD
+from src.hansen_change import change_polygons_geojson as hansen_polygons_geojson
 from src.geo_crossref import (
     cross_reference_geojson,
     download_sigmine_para,
@@ -73,9 +76,13 @@ def write_outputs(geojson: dict, meta: dict, mining, logging) -> None:
             "unknown": status_counts.get("unknown", 0),
         },
         "data_mode": "live",
-        "method": (
-            f"NDVI loss > {NDVI_LOSS_THRESHOLD}, min {MIN_PATCH_AREA_HA} ha, {VECTOR_SCALE_M}m; "
-            "cross-ref vs ANM SIGMINE + GFW logging"
+        "method": meta.get(
+            "method",
+            (
+                f"NDVI loss > {NDVI_LOSS_THRESHOLD} or NBR loss > {NBR_LOSS_THRESHOLD}, "
+                f"min {MIN_PATCH_AREA_HA} ha, {VECTOR_SCALE_M}m; "
+                "cross-ref vs ANM SIGMINE + GFW logging"
+            ),
         ),
         "last_updated": date.today().isoformat(),
     }
@@ -108,6 +115,7 @@ def main() -> None:
 
     print(f"Study area: {STUDY_AREA.name}")
     print(f"NDVI loss threshold: {NDVI_LOSS_THRESHOLD}")
+    print(f"NBR loss threshold: {NBR_LOSS_THRESHOLD}")
     print(f"Min patch area: {MIN_PATCH_AREA_HA} ha")
     print(f"Vector scale: {VECTOR_SCALE_M} m")
     print()
@@ -124,24 +132,46 @@ def main() -> None:
         print(f"Reusing cached change polygons from {raw_path}")
         geojson = json.loads(raw_path.read_text(encoding="utf-8"))
     else:
-        print("Initializing Earth Engine...")
-        initialize_ee()
+        geojson = None
+        try:
+            print("Initializing Earth Engine...")
+            initialize_ee()
 
-        print("Updating GEE metadata...")
-        meta = get_composite_metadata(STUDY_AREA)
-        save_metadata(meta_path, meta)
+            print("Updating GEE metadata...")
+            meta = get_composite_metadata(STUDY_AREA)
+            save_metadata(meta_path, meta)
 
-        print("Computing change polygons in GEE (may take 1-3 minutes)...")
-        fc = change_polygons_fc(STUDY_AREA)
-        count = fc.size().getInfo()
-        print(f"  Polygons after filter: {count}")
+            print("Computing change polygons in GEE (may take several minutes)...")
+            fc = change_polygons_fc(STUDY_AREA)
+            count = fc.size().getInfo()
+            print(f"  Polygons after filter: {count}")
 
-        if count == 0:
-            print("No change polygons found. Try lowering NDVI_LOSS_THRESHOLD or MIN_PATCH_AREA_HA.")
+            if count:
+                print("Downloading polygon geometries from GEE...")
+                geojson = fc_to_geojson_dict(fc)
+        except Exception as exc:
+            print(f"Earth Engine pull unavailable ({exc}). Using Hansen tree-cover loss tiles.")
+
+        if geojson is None:
+            print("Detecting clearings from Hansen Global Forest Change tiles...")
+            geojson = hansen_polygons_geojson(
+                STUDY_AREA,
+                dest_dir=RAW / "hansen",
+                min_patch_area_ha=MIN_PATCH_AREA_HA,
+            )
+            meta = {
+                "before_image_count": meta.get("before_image_count", 0),
+                "after_image_count": meta.get("after_image_count", 0),
+                "method": (
+                    f"{HANSEN_METHOD}, min {MIN_PATCH_AREA_HA} ha; "
+                    "cross-ref vs ANM SIGMINE + GFW logging"
+                ),
+            }
+
+        if not geojson.get("features"):
+            print("No change polygons found.")
             sys.exit(1)
 
-        print("Downloading polygon geometries from GEE...")
-        geojson = fc_to_geojson_dict(fc)
         with raw_path.open("w", encoding="utf-8") as f:
             json.dump(geojson, f)
         print(f"  Cached raw change polygons to {raw_path}")

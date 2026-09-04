@@ -38,15 +38,15 @@ export default function MethodologyPage() {
         <section className="card methodology-block">
           <h2>Study area</h2>
           <p>
-            <strong>Southern Pará (Novo Progresso corridor)</strong>: a ~115 × 95
-            km pilot AOI along the BR-163 highway. The region has high INPE DETER
-            alert density and documented pressure from illegal mining and forest
-            clearing.
+            <strong>Southern Pará (Novo Progresso corridor)</strong>: a ~265 by
+            245 km study area along the BR-163 highway. The region has high INPE
+            DETER alert density and documented pressure from illegal mining and
+            forest clearing.
           </p>
           <ul className="method-list">
             <li>Before composite: 2019 annual Sentinel-2 median</li>
             <li>After composite: 2023 annual Sentinel-2 median</li>
-            <li>BBox (W,S,E,N): -56.30, -7.90, -55.25, -7.05</li>
+            <li>BBox (W,S,E,N): -57.00, -8.60, -54.60, -6.40</li>
           </ul>
         </section>
 
@@ -98,12 +98,20 @@ export default function MethodologyPage() {
 
           <h3>Baseline: spectral index differencing (currently live on the map)</h3>
           <p>
-            Compute NDVI for before and after composites. Flag pixels where
-            vegetation index loss exceeds 0.18 and where pre-change NDVI was above
-            0.55 (the pixel was vegetated). Vectorize at 30 m and keep patches ≥
-            5 ha. Fast, interpretable, and commonly used operationally. Works well
-            for forest clearing; weaker on bare-soil mining sites where vegetation
-            indices underperform.
+            Two live paths can produce the change polygons. The preferred path
+            compares NDVI and NBR on Sentinel-2 before and after composites
+            through Earth Engine. A pixel is flagged if it was vegetated (NDVI
+            above 0.40) and then lost enough canopy that NDVI dropped by more
+            than 0.12 or NBR dropped by more than 0.10. Small holes inside those
+            patches are filled so a visible clearing stays one shape.
+            When Earth Engine is not available, the map uses{" "}
+            <a href={SOURCE_LINKS.hansen} target="_blank" rel="noopener noreferrer">
+              Hansen Global Forest Change
+            </a>{" "}
+            tree-cover loss for 2019 to 2023 at 30 m. That product maps complete
+            stand-replacement clearings, so large blocks that a capped NDVI
+            sample can miss still appear. In Brazil, patches smaller than 2
+            hectares are dropped. Inside US parks the floor is 0.5 hectares.
           </p>
 
           <h3>Learned model: Siamese / early-fusion U-Net (planned)</h3>
@@ -202,7 +210,19 @@ export default function MethodologyPage() {
         </section>
 
         <section className="card methodology-block">
-          <h2>5. Validation</h2>
+          <h2>5. US protected parks</h2>
+          <p>
+            The same Sentinel-2 change method is also run over a small set of US
+            national parks and preserves with documented illegal mining or
+            logging pressure. Detections are clipped to National Park Service
+            boundary polygons. These parks are not in Brazilian permit
+            registries, so the map treats vegetation loss inside a protected
+            boundary as the signal, not a permit match.
+          </p>
+        </section>
+
+        <section className="card methodology-block">
+          <h2>6. Validation</h2>
           <ul className="method-list">
             <li>
               Compare flagged sites against{" "}

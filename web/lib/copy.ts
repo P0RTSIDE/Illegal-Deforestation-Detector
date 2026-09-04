@@ -1,4 +1,8 @@
-import type { ParkProperties, PermitStatus } from "./types";
+import type {
+  ParkClearingProperties,
+  ParkProperties,
+  PermitStatus,
+} from "./types";
 
 /** Plain-language labels for the dashboard legend */
 export const STATUS_LABELS_PLAIN: Record<PermitStatus, string> = {
@@ -49,7 +53,7 @@ export const DATA_SOURCES = {
   hansen: {
     name: "Hansen Global Forest Change",
     url: "https://storage.googleapis.com/earthengine-stac/catalog/UMD_hansen_global_forest_change_2023_v1.json",
-    role: "Reference dataset for tree cover loss.",
+    role: "Tree-cover loss from 2019 to 2023 used for the live clearing overlays.",
   },
   gfw: {
     name: "Global Forest Watch",
@@ -121,6 +125,34 @@ export function buildSitePopup(props: PopupFields): string {
       <p class="site-popup-sources-title"><strong>Where this comes from</strong></p>
       <ul class="site-popup-sources">${sourceLinks}</ul>
       <p class="site-popup-fine-print">Flags use public satellite imagery plus mining and logging permit databases. They are not proof of a crime or a final legal finding.</p>
+    </div>
+  `;
+}
+
+export function buildParkClearingPopup(props: ParkClearingProperties): string {
+  const area =
+    typeof props.area_ha === "number"
+      ? `${props.area_ha.toFixed(1)} hectares`
+      : "Area not available";
+  const year = props.detected_year ?? "Unknown year";
+  const name = props.name ?? "Detected clearing";
+  const location =
+    props.boundary_clipped === false
+      ? `Near ${props.park_name} (park boundary not applied)`
+      : `Inside ${props.park_name}`;
+
+  return `
+    <div class="site-popup">
+      <strong class="site-popup-title">${name}</strong>
+      <p class="site-popup-status"><span class="site-popup-tag">Clearing in a protected park</span></p>
+      <p class="site-popup-text">Satellite data shows tree-cover loss here. Mining and logging are generally prohibited inside this protected area. Loss can also come from fire, insects, or other disturbance, so this is a starting point, not a finding.</p>
+      <ul class="site-popup-facts">
+        <li><strong>Location:</strong> ${location}</li>
+        <li><strong>Cleared area:</strong> ${area}</li>
+        <li><strong>Change detected around:</strong> ${year}</li>
+        <li><strong>Detection method:</strong> Hansen tree-cover loss, 2019 to 2023</li>
+      </ul>
+      <p class="site-popup-fine-print">Detected clearings are automated hints from satellite imagery. They are not proof of illegal activity and have not been verified on the ground.</p>
     </div>
   `;
 }
