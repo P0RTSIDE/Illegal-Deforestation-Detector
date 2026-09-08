@@ -346,13 +346,15 @@ export default function MethodologyPage() {
         </section>
 
         <div className="disclaimer">
-          <strong>Important caveat:</strong> This is a heuristic flagging system
-          based on public data completeness, not a legal determination. Concession
-          registries are often outdated or incomplete. &quot;Outside a
+          <strong>Limits of this map:</strong> This is a heuristic flagging
+          system based on public data completeness, not a legal determination.
+          Concession registries are often outdated or incomplete. &quot;Outside a
           concession&quot; means not accounted for in available public records,
-          not proven illegality. 10 m Sentinel-2 resolution misses small-scale
-          clearings; cloud cover creates temporal gaps; garimpo sites frequently
-          lack formal polygons. No field verification in v1.
+          not proven illegality. Yellow or dry-looking ground without a shape
+          often predates the 2019 to 2023 window. 10 m Sentinel-2 resolution
+          misses small-scale clearings; cloud cover creates temporal gaps;
+          garimpo sites frequently lack formal polygons. No field verification
+          in v1.
         </div>
 
         <footer>

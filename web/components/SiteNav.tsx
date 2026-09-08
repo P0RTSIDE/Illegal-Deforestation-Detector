@@ -9,7 +9,8 @@ export default function SiteNav({ active = "dashboard" }: SiteNavProps) {
     <header className="site-nav">
       <div className="site-nav-inner">
         <Link href="/" className="site-brand">
-          Forest Clearing Map
+          <span className="site-brand-mark" aria-hidden="true" />
+          Forest Clearing Detector
         </Link>
         <nav className="site-links" aria-label="Main">
           <Link

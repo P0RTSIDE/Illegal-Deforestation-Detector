@@ -21,8 +21,8 @@ const StudyMap = dynamic(() => import("@/components/StudyMap"), {
       style={{
         display: "grid",
         placeItems: "center",
-        color: "#94a3b8",
-        background: "#121a2b",
+        color: "#a8b5ae",
+        background: "#141e1b",
       }}
     >
       Loading map...
@@ -56,12 +56,13 @@ export default function Dashboard({
   return (
     <>
       <section className="hero">
-        <h1>Forest Clearing &amp; Permit Map</h1>
+        <p className="eyebrow">Brazilian Amazon study</p>
+        <h1>Forest clearing and permit map</h1>
         <p>
-          This map shows places where satellite images detected vegetation loss
-          in the Brazilian Amazon, then checks those spots against public mining
-          and logging permit records. Colored shapes are flagged areas, not court
-          rulings. Click any shape for details and data sources.
+          Satellite data flags vegetation loss in Southern Pará, then each
+          patch is checked against public mining and logging permit records.
+          Colored shapes are research flags, not court rulings. Click any shape
+          for details and sources.
         </p>
         <div className="badge-row">
           <span className="badge">{summary.study_area}</span>
@@ -76,6 +77,18 @@ export default function Dashboard({
         </div>
       </section>
 
+      <aside className="callout callout-warn" aria-label="How to read bare ground">
+        <p className="callout-label">Why some yellow or dry ground is not tagged</p>
+        <p>
+          Bare, tan, or yellow ground is not a flag by itself. This region is
+          wet tropical forest. Bright soil usually means pasture, a road, or an
+          older clearing, not a dry climate. Shapes mark tree cover that was
+          lost between {summary.before_year} and {summary.after_year}. Land
+          cleared before {summary.before_year} can look more barren than a
+          newer grassy patch and still stay untagged.
+        </p>
+      </aside>
+
       <section className="card how-to-read">
         <h2>How to read the map</h2>
         <div className="how-to-grid">
@@ -88,18 +101,19 @@ export default function Dashboard({
             </p>
           </div>
           <div>
+            <h3>Untagged yellow ground</h3>
+            <p>
+              A yellow or dead-looking strip with no overlay was usually
+              already cleared before {summary.before_year}, or was never forest
+              in the baseline. The photo shows how the land looks now. The
+              overlay only shows recent canopy loss.
+            </p>
+          </div>
+          <div>
             <h3>Blue dashed box</h3>
             <p>
               The blue outline is the study region we analyzed. Only clearings
               inside this box are shown.
-            </p>
-          </div>
-          <div>
-            <h3>Click a shape</h3>
-            <p>
-              Click any flagged area to open a popup with plain-language status,
-              cleared area size, detection method, and links to the public data
-              behind the flag.
             </p>
           </div>
           <div>
@@ -117,19 +131,19 @@ export default function Dashboard({
         <div className="card">
           <h2>Interactive map</h2>
           <p className="card-intro">
-            Use the buttons below to move between the Amazon study area and a
-            reference layer of US protected parks with illegal mining or logging
-            pressure. Use the layer control (top right) to switch base maps or
-            hide a layer, and zoom in to inspect individual sites.
+            Switch regions with the buttons below. Use the layer control in the
+            top right to change the base map or hide a layer. Zoom in to inspect
+            individual sites.
           </p>
-          <p className="map-note">
-            Bare, yellow, or dry-looking ground is not tagged just because it
-            looks cleared today. Shapes mark tree cover that was lost between{" "}
-            {summary.before_year} and {summary.after_year}. Older fields, roads,
-            and clearings from before {summary.before_year} can stay untagged,
-            even when they look more barren than a newer patch that still has
-            some grass.
-          </p>
+          <aside className="callout callout-warn callout-compact">
+            <p className="callout-label">Untagged yellow or dry ground</p>
+            <p>
+              If a bright strip has no colored shape, it was likely cleared
+              before {summary.before_year}, or was never forest. Newer
+              clearings can look slightly green as grass returns and still be
+              tagged. Older bare ground can look worse and still be skipped.
+            </p>
+          </aside>
           <div className="region-switch" role="group" aria-label="Map region">
             <button
               type="button"
@@ -314,14 +328,18 @@ export default function Dashboard({
       </section>
 
       <div className="disclaimer">
-        <strong>Important:</strong> Flagged areas are automated hints based on
-        satellite imagery and incomplete public permit databases. They are not
-        legal findings and have not been verified on the ground. Small clearings
-        and informal mining sites are easy to miss.
+        <strong>Limits of this map:</strong> Flagged areas are automated hints
+        from satellite imagery and incomplete public permit records. They are
+        not legal findings and have not been verified on the ground. Yellow or
+        dry-looking ground without a shape is often older clearing or a road,
+        not a missed detection from {summary.before_year} to{" "}
+        {summary.after_year}. Small clearings and informal mining sites are
+        easy to miss.
       </div>
 
       <footer>
-        Last updated: {summary.last_updated}. Built with Next.js and Leaflet.
+        Last updated {summary.last_updated}. Public satellite and permit data
+        only.
       </footer>
     </>
   );
