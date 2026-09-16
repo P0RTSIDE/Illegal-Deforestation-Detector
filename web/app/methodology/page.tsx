@@ -133,7 +133,7 @@ export default function MethodologyPage() {
             <a href={SOURCE_LINKS.hansen} target="_blank" rel="noopener noreferrer">
               Hansen Global Forest Change
             </a>{" "}
-            tree-cover loss (imperfect but usable at portfolio scale). Validation
+            tree-cover loss. Validation
             uses a <strong>spatial hold-out region</strong>, not random pixel
             splits. Spatial autocorrelation makes random splits misleadingly
             optimistic for geospatial data.
@@ -168,9 +168,7 @@ export default function MethodologyPage() {
               >
                 GFW managed forest concessions
               </a>{" "}
-              clipped to the study bbox via ArcGIS REST, plus optional local
-              SINAFLOR shapefiles dropped in{" "}
-              <code>data/raw/concessions/logging/sinaflor/</code>
+              clipped to the study area through ArcGIS REST.
             </li>
           </ul>
           <p>
@@ -298,8 +296,8 @@ export default function MethodologyPage() {
                       rel="noopener noreferrer"
                     >
                       GFW managed forest concessions
-                    </a>{" "}
-                    (primary for this pipeline), optional{" "}
+                    </a>
+                    , with optional{" "}
                     <a
                       href={SOURCE_LINKS.sinaflor}
                       target="_blank"
@@ -307,7 +305,7 @@ export default function MethodologyPage() {
                     >
                       IBAMA SINAFLOR
                     </a>{" "}
-                    shapefiles
+                    records when available
                   </td>
                   <td>Permit boundaries</td>
                 </tr>

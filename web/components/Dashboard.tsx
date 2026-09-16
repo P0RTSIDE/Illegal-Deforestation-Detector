@@ -135,15 +135,6 @@ export default function Dashboard({
             top right to change the base map or hide a layer. Zoom in to inspect
             individual sites.
           </p>
-          <aside className="callout callout-warn callout-compact">
-            <p className="callout-label">Untagged yellow or dry ground</p>
-            <p>
-              If a bright strip has no colored shape, it was likely cleared
-              before {summary.before_year}, or was never forest. Newer
-              clearings can look slightly green as grass returns and still be
-              tagged. Older bare ground can look worse and still be skipped.
-            </p>
-          </aside>
           <div className="region-switch" role="group" aria-label="Map region">
             <button
               type="button"
