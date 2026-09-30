@@ -1,168 +1,102 @@
-# Satellite-Based Illegal Deforestation / Mining Detector
+# Clearing and Permit Map
 
-Portfolio project combining **Sentinel-2 change detection** with **public concession/permit cross-referencing** to flag likely unpermitted land clearing in the Brazilian Amazon.
+Pairs satellite change detection with public concession records to flag land clearing that does not match an available mining or logging permit. The pilot area is the Brazilian Amazon. A second mode looks for vegetation loss inside US national park boundaries.
 
-> **Important:** This system produces *heuristic flags* based on incomplete public records. "Outside a concession boundary" means "not accounted for in available registries", not proven illegality. See limitations in `reports/writeup.md` (coming) and `data/DATA_NOTES.md`.
+Live dashboard: [illegal-deforestation-detector.vercel.app](https://illegal-deforestation-detector.vercel.app/).
+
+Flags are heuristic and depend on incomplete public records. A clearing outside a concession boundary means it is not accounted for in the registries used here. It is not a legal finding. Details are in `data/DATA_NOTES.md`.
 
 ## Study area
 
-**Southern Pará (Novo Progresso corridor)**: a ~55 × 45 km pilot AOI with high DETER alert density and documented illegal mining pressure.
+Southern Pará, along the Novo Progresso corridor: a pilot box of about 55 by 45 km with high DETER alert density and documented mining pressure.
 
 | Parameter | Value |
-|-----------|-------|
-| BBox (W,S,E,N) | -56.30, -7.90, -55.25, -7.05 |
+| --- | --- |
+| BBox (W, S, E, N) | -56.30, -7.90, -55.25, -7.05 |
 | Before year | 2019 |
 | After year | 2023 |
 | Config | `src/config.py` |
 
-## Quick start
+US park boundaries are defined in `src/us_parks.py`. Parks are not checked against mining permits. The signal there is vegetation loss inside a protected boundary.
 
-### 1. Prerequisites
+## Method
 
-- Python 3.10+
-- [Google Earth Engine account](https://signup.earthengine.google.com/) (free non-commercial)
-- A Google Cloud project registered for Earth Engine: [register here](https://code.earthengine.google.com/register)
+1. **Imagery.** Google Earth Engine builds Sentinel-2 median composites for the before and after years (`src/gee_utils.py`). When Earth Engine is unavailable, Hansen Global Forest Change tiles supply a 30 m tree-cover-loss map (`src/hansen_change.py`).
+2. **Spectral change.** A pixel is flagged when it was vegetated before and then loses NDVI or NBR past a fixed threshold. Small holes are closed, patches under an area floor are dropped, and the mask is vectorized (`src/change_detection.py`). Thresholds and the hectare floor are constants in that module.
+3. **Permit join.** Detected polygons are compared with ANM SIGMINE mining permits for Pará and Global Forest Watch logging concessions, plus an optional local IBAMA SINAFLOR shapefile (`src/geo_crossref.py`). Status labels distinguish no permit found, overlap with a registered permit, possible exceedance, and unclear match.
+4. **Context layers.** INPE DETER and PRODES, and Hansen Global Forest Change, are the external checks described in `data/DATA_NOTES.md`.
+5. **Map.** `scripts/generate_real_flags.py` writes GeoJSON under `data/processed/`. `scripts/export_for_web.py` copies that into the Next.js app in `web/`. Park runs use `scripts/generate_park_flags.py`.
 
-### 2. Install
+The shipped detector is this spectral baseline. `src/model.py` is not used by the pipeline.
+
+## Run the pipeline
+
+Python 3.10 or newer, a Google Earth Engine account, and a Google Cloud project registered for Earth Engine.
 
 ```bash
-cd deforestation-detector
 python -m venv .venv
-.venv\Scripts\activate        # Windows
+source .venv/bin/activate
 pip install -r python/requirements.txt
-```
-
-### 3. Authenticate Earth Engine
-
-```bash
 python scripts/authenticate_gee.py
-# Or: earthengine authenticate
 ```
 
-### 4. Configure project ID
+On Windows, activate with `.venv\Scripts\activate`.
 
-```bash
-copy .env.example .env
-# Edit .env → GEE_PROJECT_ID=your-gcp-project-id
-```
-
-### 5. Test the data pipeline (no model code yet)
+Copy `.env.example` to `.env` and set `GEE_PROJECT_ID`.
 
 ```bash
 python scripts/test_gee_pull.py
+python scripts/generate_real_flags.py
+python scripts/export_for_web.py
 ```
 
-This verifies Sentinel-2 collections return images for 2019 and 2023 and writes `data/raw/gee_metadata.json`.
+`test_gee_pull.py` checks that Sentinel-2 returns imagery for 2019 and 2023 and writes `data/raw/gee_metadata.json`. `--export-drive` sends full composites to Google Drive. Tasks show up at [code.earthengine.google.com/tasks](https://code.earthengine.google.com/tasks).
 
-To export full composites to Google Drive:
+## Dashboard
+
+The site in `web/` is a Next.js map (Leaflet) with permit-status coloring and site popups. Vercel hosts that visualization. The Python pipeline runs separately and feeds it precomputed GeoJSON.
 
 ```bash
-python scripts/test_gee_pull.py --export-drive
-```
-
-Monitor tasks at [code.earthengine.google.com/tasks](https://code.earthengine.google.com/tasks).
-
-## Repo structure
-
-```
-deforestation-detector/
-  data/
-    raw/                  # GEE exports, concession shapefiles
-    processed/            # aligned image pairs, tiled patches
-    DATA_NOTES.md         # data sources, licensing, caveats
-  notebooks/
-    01_gee_data_pull.ipynb
-    02_preprocessing_and_tiling.ipynb      (planned)
-    03_change_detection_model.ipynb        (planned)
-    04_concession_crossref.ipynb           (planned)
-    05_validation_against_hansen.ipynb     (planned)
-  src/
-    config.py             # study area, bands, GEE collection IDs
-    gee_utils.py            # Earth Engine auth, composites, export
-    preprocessing.py        (planned)
-    dataset.py              (planned)
-    model.py                (planned)
-    train.py                (planned)
-    inference.py            (planned)
-    geo_crossref.py         (planned)
-  scripts/
-    authenticate_gee.py
-    test_gee_pull.py
-    export_for_web.py       # copy pipeline outputs → web/public/data/
-  web/                      # Next.js dashboard (deploy to Vercel)
-    app/
-    components/
-    public/data/            # GeoJSON + summary JSON for the map
-  reports/
-    figures/
-  python/requirements.txt
-  README.md
-```
-
-## Web dashboard (Vercel)
-
-The portfolio site lives in **`web/`**, a Next.js app with an interactive satellite map and flagged-site popups. Vercel hosts the visualization; the Python pipeline runs locally and feeds it pre-computed GeoJSON.
-
-```bash
-# Preview locally
 cd web
 npm install
 npm run dev
 ```
 
-```bash
-# Sync GEE metadata (and live outputs when ready)
-python scripts/export_for_web.py
+Open http://localhost:3000. On Vercel, set the project root directory to `web`. See `web/README.md`.
+
+Until `export_for_web.py` has real output, the map shows the demo polygons that ship in the repo.
+
+## Repository layout
+
+```
+src/           config, Earth Engine helpers, NDVI/NBR change, Hansen tiles, permit join, US parks
+scripts/       auth, GEE smoke test, flag generation, export into web/public/data
+web/           Next.js dashboard
+data/          raw exports, processed GeoJSON, DATA_NOTES.md
+python/        requirements.txt
 ```
 
-**Deploy:** Push to GitHub and import the repo at [vercel.com/new](https://vercel.com/new). Set the project's Root Directory to `web` so Vercel builds the Next.js dashboard rather than the Python code at the repo root.
-
-See `web/README.md` for local dev.
-
-The map shows demo polygons until real change detection results are generated and synced with `export_for_web.py`.
-
-## What to do next (ML pipeline)
-
-| Step | Action | Command / file |
-|------|--------|----------------|
-| 1 ✅ | GEE pipeline verified | `python scripts/test_gee_pull.py` |
-| 2 | Export image composites | `python scripts/test_gee_pull.py --export-drive` |
-| 3 | Download ANM SIGMINE Pará | See `data/DATA_NOTES.md` → `data/raw/concessions/` |
-| 4 | Preprocess + tile rasters | Notebook `02_preprocessing_and_tiling.ipynb` |
-| 5 | Baseline NDVI/NBR change map | Before any CNN, interpretable baseline |
-| 6 | Concession spatial join | `geo_crossref.py` / notebook 04 |
-| 7 | Push results to website | `python scripts/export_for_web.py` → redeploy Vercel |
-
-## Methodology (build order)
-
-1. **Data acquisition**: GEE Sentinel-2 before/after median composites
-2. **Preprocessing**: cloud masking, tiling, normalization
-3. **Change detection**: spectral index baseline (NDVI/NBR diff), then learned Siamese/U-Net
-4. **Concession cross-reference**: spatial join detected polygons vs ANM SIGMINE / GFW layers
-5. **Validation**: DETER/PRODES plus Hansen sanity checks
-6. **Output**: sync results to web dashboard and deploy to Vercel
-
-## Data sources (summary)
+## Data sources
 
 | Data | Source | Notes |
-|------|--------|-------|
+| --- | --- | --- |
 | Sentinel-2 L2A | GEE `COPERNICUS/S2_SR_HARMONIZED` | 10 m, free |
 | Cloud mask | GEE `COPERNICUS/S2_CLOUD_PROBABILITY` | s2cloudless |
 | Mining permits | [ANM SIGMINE](https://app.anm.gov.br/dadosabertos/SIGMINE/) | Daily updates, authoritative for Brazil |
-| Logging permits | GFW / IBAMA SINAFLOR | Messier; see DATA_NOTES |
-| Validation | INPE DETER/PRODES, Hansen GFC | Alert vs annual vs 30 m labels |
+| Logging permits | GFW managed forests, optional IBAMA SINAFLOR | See DATA_NOTES |
+| Validation context | INPE DETER/PRODES, Hansen GFC | Alert, annual, and 30 m products |
+| US parks | National Park Service boundaries via `src/us_parks.py` | Protected-area mode |
 
-Full download steps and licensing: **`data/DATA_NOTES.md`**.
+Download steps and licensing: `data/DATA_NOTES.md`.
 
-## Limitations (read before demoing)
+## Limitations
 
-- 10 m Sentinel-2 misses small-scale clearings (<0.5 ha)
-- Cloud cover in tropical Amazon creates temporal gaps
-- Concession registries are incomplete; garimpo often unregistered
-- Heuristic flags ≠ legal findings; no field verification in v1
-- Hansen labels (30 m) are imperfect training targets for a 10 m model
+- 10 m Sentinel-2 misses clearings smaller than about half a hectare. The vector step also drops patches under its hectare floor.
+- Cloud cover in the Amazon leaves gaps in the composite years.
+- Concession registries are incomplete. Informal mining is often unregistered, so "no permit found" is not proof of illegality.
+- Hansen labels are 30 m and are a different product from the 10 m Sentinel-2 mask.
+- There is no field check in this version.
 
 ## License
 
-Code: MIT (add `LICENSE` file before publishing).  
-Data: each source has its own license, see `data/DATA_NOTES.md`.
+No license file is included with this repository. Each data source keeps its own terms. See `data/DATA_NOTES.md`.
